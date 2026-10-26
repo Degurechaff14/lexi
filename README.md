@@ -7,4 +7,4 @@ Agenda de plazos procesales civiles para asistentes legales y practicantes de de
 - **Expedientes:** cálculo del último día según el acto y el tipo de proceso.
 - **Reglas:** plazos usados, feriados 2026–2027 y días inhábiles extra.
 
-Los datos se guardan solo en el navegador de cada persona. Versión de prueba: las reglas de plazos están pendientes de validación jurídica y la fecha oficial siempre se verifica en el sistema del Poder Judicial.
+Con las cuentas activadas (ver `CONFIGURAR-CUENTAS.md`), cada persona entra con su correo o con Google y sus datos se guardan en su cuenta. Sin configurarlas, los datos se guardan solo en el navegador. Versión de prueba: las reglas de plazos están pendientes de validación jurídica y la fecha oficial siempre se verifica en el sistema del Poder Judicial.

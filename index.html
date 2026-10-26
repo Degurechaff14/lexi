@@ -208,6 +208,30 @@ td.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
 details summary{cursor:pointer;font-weight:600}
 .foot{font-size:.78rem;color:var(--muted);text-align:center;padding-top:8px}
 
+/* acceso con cuenta */
+.auth{min-height:100vh;display:flex;align-items:center;justify-content:center;padding-block:32px}
+.auth-card{width:100%;max-width:430px;display:flex;flex-direction:column;gap:16px;padding:26px}
+.auth-card .brand{justify-content:center;margin-bottom:4px}
+.auth-card h1{font-size:1.5rem;text-align:center}
+.auth-card .lead{margin:0;text-align:center;color:var(--muted);font-size:.92rem}
+.btn.block{width:100%;justify-content:center}
+.btn-google{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.btn-google:hover{background:var(--soft)}
+.btn-google svg{width:18px;height:18px}
+.divider{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:.8rem}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line)}
+.linkbtn{background:none;border:0;padding:0;color:var(--accent);font:600 .85rem var(--font-body);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.msg{border-radius:10px;padding:10px 12px;font-size:.86rem}
+.msg.err{background:var(--red-soft);color:var(--red)}
+.msg.ok{background:var(--green-soft);color:var(--green)}
+.code-input{font:600 1.4rem var(--font-mono);letter-spacing:.4em;text-align:center}
+.hint{font-size:.78rem;color:var(--muted);font-weight:400}
+.acct{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.who{font:600 .85rem var(--font-body)}
+.sync{font:500 .72rem var(--font-mono);color:var(--muted)}
+.sync.err{color:var(--red)}
+.btn[disabled]{opacity:.6;cursor:wait}
+
 /* aviso flotante */
 #toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,16px);opacity:0;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font:500 .88rem var(--font-body);pointer-events:none;z-index:20;max-width:calc(100% - 32px);box-shadow:0 10px 30px var(--shadow);display:flex;gap:8px;align-items:center;transition:opacity .25s,transform .25s}
 #toast.show{opacity:1;transform:translate(-50%,0)}
@@ -233,6 +257,14 @@ details summary{cursor:pointer;font-weight:600}
 <div class="wrap" id="app"></div>
 <div id="toast" role="status" aria-live="polite"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script>
+/* Configuración de cuentas (Supabase). Si se dejan vacías, Lexi funciona sin cuentas y guarda todo en el navegador. */
+window.LEXI_CONFIG={
+  supabaseUrl:'',
+  supabaseKey:''
+};
+</script>
 <script>
 (function(){
 'use strict';
@@ -286,8 +318,20 @@ const pc=new Map();
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let saveFailed=false,lastKey=null,tema='marino',toastT=null;
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));saveFailed=false}catch(e){saveFailed=true}}
-function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&Array.isArray(o.exps))S=Object.assign(S,o);return true}}catch(e){}return false}
+const CFG=window.LEXI_CONFIG||{};
+const CLOUD=!!(CFG.supabaseUrl&&CFG.supabaseKey);
+let sb=null,user=null,profile=null,syncT=null,sync='ok';
+const storeKey=()=>user?KEY+':'+user.id:KEY;
+function save(){try{localStorage.setItem(storeKey(),JSON.stringify(S));saveFailed=false}catch(e){saveFailed=true}if(user)queueSync()}
+function queueSync(){clearTimeout(syncT);sync='pending';syncUI();syncT=setTimeout(pushCloud,700)}
+async function pushCloud(){
+  if(!user)return;
+  const {error}=await sb.from('user_data').upsert({user_id:user.id,data:S,updated_at:new Date().toISOString()});
+  sync=error?'err':'ok';syncUI();
+}
+function syncUI(){const el=document.getElementById('sync');if(!el)return;el.className='sync'+(sync==='err'?' err':'');el.textContent=sync==='pending'?'Guardando…':sync==='err'?'Sin conexión · no guardado':'Guardado en tu cuenta'}
+const whereTxt=()=>user?'Los datos se guardan en tu cuenta de Lexi.':'Los datos se guardan únicamente en este navegador.';
+function load(){try{const r=localStorage.getItem(storeKey());if(r){const o=JSON.parse(r);if(o&&Array.isArray(o.exps))S=Object.assign(S,o);return true}}catch(e){}return false}
 function loadTema(){try{const t=localStorage.getItem(TKEY);if(PALETAS.some(p=>p[0]===t))tema=t}catch(e){}}
 function applyTema(){document.documentElement.setAttribute('data-palette',tema)}
 function toast(msg){const el=document.getElementById('toast');el.innerHTML=ic('check')+'<span>'+esc(msg)+'</span>';el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2200)}
@@ -430,7 +474,7 @@ function vExp(){
 function formNuevo(){
   return '<form class="card stack" data-form="nuevo" id="f-nuevo">'+
   '<h3>Nuevo expediente</h3>'+
-  '<div class="aviso">'+ic('info')+'<span><strong>Usa solo el número de expediente.</strong> No escribas nombres de clientes ni datos personales. Los datos se guardan únicamente en este navegador.</span></div>'+
+  '<div class="aviso">'+ic('info')+'<span><strong>Usa solo el número de expediente.</strong> No escribas nombres de clientes ni datos personales. '+whereTxt()+'</span></div>'+
   '<div class="grid2"><label>Número de expediente<input id="f-num" required maxlength="40" placeholder="00000-2026-0-1801-JR-CI-00" autocomplete="off"></label>'+
   '<label>Materia<select id="f-mat">'+MATERIAS.map(m=>'<option'+(m==='Civil'?'':' disabled')+'>'+m+(m==='Civil'?'':' (próximamente)')+'</option>').join('')+'</select></label></div>'+
   '<div class="grid2"><label>Acto que debes presentar<select id="f-acto">'+Object.keys(ACTOS).map(k=>'<option value="'+k+'">'+ACTOS[k].label+'</option>').join('')+'</select></label>'+
@@ -485,6 +529,7 @@ function vReglas(){
 
 /* ---------- render ---------- */
 function render(){
+  if(CLOUD&&!user){renderAuth();return}
   pc.clear();
   const tabs=[['hoy','Hoy y mañana','hoy'],['cal','Calendario','cal'],['exp','Expedientes','exp'],['reglas','Reglas','reglas']];
   const cur=ui.view==='det'?'exp':ui.view;
@@ -492,12 +537,13 @@ function render(){
   const key=ui.view+'|'+(ui.view==='det'?ui.detail:''),entering=key!==lastKey;lastKey=key;
   document.getElementById('app').innerHTML=
    '<header class="top"><div class="brand"><svg class="mark" viewBox="0 0 44 44" aria-hidden="true"><rect class="pg" x="2" y="2" width="40" height="40" rx="12"/><rect class="gl" x="11" y="13" width="22" height="19" rx="4"/><path class="gl" d="M11 19h22M17 10v5M27 10v5"/><path class="gl ck" d="M17.5 25.5l3.2 3.2 6-6.4"/></svg><div><div class="name">lex<span class="i">ı<i></i></span></div><div class="tag">Plazos civiles · versión de prueba</div></div></div>'+
-   '<div class="themes" role="group" aria-label="Tema de color">'+PALETAS.map(p=>'<button class="sw" data-action="palette" data-p="'+p[0]+'" aria-pressed="'+(tema===p[0])+'" aria-label="Tema '+p[1]+'" style="--s1:'+p[2]+';--s2:'+p[3]+'"><i></i><span class="lbl">'+p[1]+'</span></button>').join('')+'</div></header>'+
+   '<div class="themes" role="group" aria-label="Tema de color">'+PALETAS.map(p=>'<button class="sw" data-action="palette" data-p="'+p[0]+'" aria-pressed="'+(tema===p[0])+'" aria-label="Tema '+p[1]+'" style="--s1:'+p[2]+';--s2:'+p[3]+'"><i></i><span class="lbl">'+p[1]+'</span></button>').join('')+'</div>'+(user?'<div class="acct"><span class="who">@'+esc(profile&&profile.username||user.email)+'</span><span id="sync" class="sync"></span><button class="btn ghost sm" data-action="logout">Cerrar sesión</button></div>':'')+'</header>'+
    '<nav aria-label="Secciones"><div class="seg">'+tabs.map(t=>'<button data-action="view" data-v="'+t[0]+'"'+(cur===t[0]?' aria-current="page"':'')+'>'+ic(t[2])+t[1]+'</button>').join('')+'</div></nav>'+
    '<div class="aviso notice">'+ic('info')+'<span><strong>Lexi solo muestra lo que tú cargaste.</strong> Si falta un expediente aquí, no aparecerá su plazo. Verifica siempre la fecha oficial en el sistema del Poder Judicial.</span></div>'+
    '<main class="view'+(entering?' enter':'')+'">'+body+'</main>'+
-   '<div class="foot">'+(saveFailed?'No se pudo guardar en este navegador. Tus cambios se perderán al cerrar la página. ':'Tus datos se guardan solo en este navegador. ')+'No cargues nombres de clientes ni datos personales.</div>';
+   '<div class="foot">'+(saveFailed?'No se pudo guardar en este navegador. Tus cambios se perderán al cerrar la página. ':(user?'Tus datos se guardan en tu cuenta de Lexi. ':'Tus datos se guardan solo en este navegador. '))+'No cargues nombres de clientes ni datos personales.</div>';
   if(ui.view==='exp'&&ui.showForm)formPrev();
+  syncUI();
 }
 
 /* ---------- datos de ejemplo ---------- */
@@ -525,6 +571,7 @@ document.addEventListener('click',function(ev){
   const el=ev.target.closest('[data-action]');if(!el)return;
   const a=el.dataset.action,id=el.dataset.id;
   if(a==='togglenote')return;
+  if(a.startsWith('auth')||a==='logout'){authAction(a,el);return}
   if(a==='view'){ui.view=el.dataset.v;ui.showForm=false}
   else if(a==='palette'){tema=el.dataset.p;applyTema();try{localStorage.setItem(TKEY,tema)}catch(e){}toast('Tema '+PALETAS.find(p=>p[0]===tema)[1])}
   else if(a==='open'){ui.detail=id;ui.view='det';ui.confirm=null;ui.sel.det=null;ui.cal.det=null;scrollTo(0,0)}
@@ -548,6 +595,7 @@ document.addEventListener('input',function(ev){if(ev.target.id==='f-notif')formP
 document.addEventListener('submit',function(ev){
   const f=ev.target.closest('form[data-form]');if(!f)return;ev.preventDefault();
   const k=f.dataset.form,g=id=>document.getElementById(id);
+  if(k.startsWith('auth-')){authSubmit(k,g);return}
   if(k==='nuevo'){
     const acto=g('f-acto').value,a=ACTOS[acto];
     const e={id:uid(),numero:g('f-num').value.trim(),materia:'Civil',acto,proceso:a.proceso?g('f-proc').value:null,estado:'pendiente'};
@@ -566,9 +614,129 @@ document.addEventListener('submit',function(ev){
   render();
 });
 
+/* ---------- cuentas ---------- */
+const A={mode:'login',email:'',user:'',pw:'',pw2:'',kind:'signup',err:'',ok:'',busy:false};
+const GOOGLE='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.6 12.3c0-.8-.1-1.5-.2-2.2H12v4.2h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-1.9 3.3-4.8 3.3-8z"/><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.7c-1 .7-2.2 1-3.7 1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.8A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.8 14.1a6.6 6.6 0 0 1 0-4.2V7.1H2.1a11 11 0 0 0 0 9.8z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.2-3.2A11 11 0 0 0 2.1 7.1l3.7 2.8C6.7 7.3 9.1 5.4 12 5.4z"/></svg>';
+const SITE=location.origin+location.pathname;
+function tErr(e){
+  const m=(e&&e.message)||String(e||'');
+  if(/Invalid login credentials/i.test(m))return 'Correo o contraseña incorrectos.';
+  if(/Email not confirmed/i.test(m))return 'Tu correo aún no está confirmado. Te enviamos un código nuevo.';
+  if(/expired|invalid.*(otp|token)|Token has expired/i.test(m))return 'El código no es válido o ya venció. Pide uno nuevo.';
+  if(/rate limit|security purposes|too many/i.test(m))return 'Demasiados intentos seguidos. Espera unos minutos y vuelve a intentar.';
+  if(/at least|weak/i.test(m))return 'La contraseña debe tener al menos 8 caracteres.';
+  if(/already registered|already exists/i.test(m))return 'Ese correo ya tiene una cuenta. Inicia sesión.';
+  if(/Database error saving new user|duplicate key/i.test(m))return 'Ese nombre de usuario ya está en uso. Elige otro.';
+  if(/Failed to fetch|NetworkError/i.test(m))return 'No hay conexión con el servidor. Revisa tu internet.';
+  return 'No se pudo completar: '+m;
+}
+function renderAuth(){
+  const msg=(A.err?'<div class="msg err" role="alert">'+esc(A.err)+'</div>':'')+(A.ok?'<div class="msg ok" role="status">'+esc(A.ok)+'</div>':'');
+  const dis=A.busy?' disabled':'';
+  const google='<button class="btn btn-google block" type="button" data-action="auth-google"'+dis+'>'+GOOGLE+'Continuar con Google</button><div class="divider">o con tu correo</div>';
+  const tabs='<div class="seg" role="tablist"><button type="button" data-action="auth-mode" data-m="login"'+(A.mode==='login'?' aria-current="page"':'')+'>Iniciar sesión</button><button type="button" data-action="auth-mode" data-m="signup"'+(A.mode==='signup'?' aria-current="page"':'')+'>Crear cuenta</button></div>';
+  let h='';
+  if(A.mode==='login'){
+    h=tabs+google+'<form class="stack" data-form="auth-login"><label>Correo<input type="email" id="a-email" required autocomplete="email" value="'+esc(A.email)+'"></label><label>Contraseña<input type="password" id="a-pass" required autocomplete="current-password" value="'+esc(A.pw)+'"></label>'+msg+'<button class="btn block" type="submit"'+dis+'>'+(A.busy?'Ingresando…':'Iniciar sesión')+'</button></form><div class="row between"><button class="linkbtn" type="button" data-action="auth-mode" data-m="forgot">¿Olvidaste tu contraseña?</button></div>';
+  }else if(A.mode==='signup'){
+    h=tabs+google+'<form class="stack" data-form="auth-signup"><label>Nombre de usuario<input id="a-user" required minlength="3" maxlength="20" pattern="[a-z0-9_]{3,20}" autocomplete="username" placeholder="ej.: arles_practicante" value="'+esc(A.user)+'"><span class="hint">3 a 20 caracteres: minúsculas, números o guion bajo.</span></label><label>Correo<input type="email" id="a-email" required autocomplete="email" value="'+esc(A.email)+'"></label><label>Contraseña<input type="password" id="a-pass" required minlength="8" autocomplete="new-password" value="'+esc(A.pw)+'"><span class="hint">Mínimo 8 caracteres.</span></label><label>Repite la contraseña<input type="password" id="a-pass2" required minlength="8" autocomplete="new-password" value="'+esc(A.pw2)+'"></label>'+msg+'<button class="btn block" type="submit"'+dis+'>'+(A.busy?'Creando cuenta…':'Crear cuenta')+'</button></form>';
+  }else if(A.mode==='code'){
+    h='<form class="stack" data-form="auth-code"><p class="lead">Te enviamos un código de confirmación a <strong>'+esc(A.email)+'</strong>. Revisa también la carpeta de spam.</p><label>Código<input id="a-code" class="code-input" required inputmode="numeric" autocomplete="one-time-code" minlength="6" maxlength="10" pattern="[0-9]{6,10}"></label>'+msg+'<button class="btn block" type="submit"'+dis+'>'+(A.busy?'Verificando…':'Confirmar código')+'</button></form><div class="row between"><button class="linkbtn" type="button" data-action="auth-resend">Reenviar código</button><button class="linkbtn" type="button" data-action="auth-mode" data-m="'+(A.kind==='signup'?'signup':'login')+'">Cambiar correo</button></div>';
+  }else if(A.mode==='forgot'){
+    h='<form class="stack" data-form="auth-forgot"><p class="lead">Escribe tu correo y te enviaremos un código para crear una contraseña nueva.</p><label>Correo<input type="email" id="a-email" required autocomplete="email" value="'+esc(A.email)+'"></label>'+msg+'<button class="btn block" type="submit"'+dis+'>'+(A.busy?'Enviando…':'Enviar código')+'</button></form><button class="linkbtn" type="button" data-action="auth-mode" data-m="login">Volver a iniciar sesión</button>';
+  }else if(A.mode==='reset'){
+    h='<form class="stack" data-form="auth-reset"><p class="lead">Te enviamos un código a <strong>'+esc(A.email)+'</strong>.</p><label>Código<input id="a-code" class="code-input" required inputmode="numeric" autocomplete="one-time-code" minlength="6" maxlength="10" pattern="[0-9]{6,10}"></label><label>Contraseña nueva<input type="password" id="a-pass" required minlength="8" autocomplete="new-password"></label>'+msg+'<button class="btn block" type="submit"'+dis+'>'+(A.busy?'Guardando…':'Guardar contraseña y entrar')+'</button></form><button class="linkbtn" type="button" data-action="auth-mode" data-m="login">Volver a iniciar sesión</button>';
+  }else if(A.mode==='loading'){
+    h='<p class="lead">Cargando tus expedientes…</p>';
+  }
+  const titles={login:'Inicia sesión',signup:'Crea tu cuenta',code:'Confirma tu correo',forgot:'Recupera tu acceso',reset:'Nueva contraseña',loading:'Un momento'};
+  document.getElementById('app').innerHTML='<div class="auth"><div class="card auth-card"><div class="brand">'+MARK()+'<div><div class="name">lex<span class="i">ı<i></i></span></div><div class="tag">Plazos civiles</div></div></div><h1>'+titles[A.mode]+'</h1>'+h+'<p class="small muted" style="text-align:center;margin:0">Tus expedientes se guardan en tu cuenta. No cargues nombres de clientes ni datos personales.</p></div></div>';
+  const first=document.querySelector('.auth-card input:not([value]),.auth-card input[value=""]')||document.querySelector('.auth-card input');if(first&&!A.busy&&!A.err)first.focus();
+}
+function MARK(){return '<svg class="mark" viewBox="0 0 44 44" aria-hidden="true"><rect class="pg" x="2" y="2" width="40" height="40" rx="12"/><rect class="gl" x="11" y="13" width="22" height="19" rx="4"/><path class="gl" d="M11 19h22M17 10v5M27 10v5"/><path class="gl ck" d="M17.5 25.5l3.2 3.2 6-6.4"/></svg>'}
+function setA(o){Object.assign(A,o);renderAuth()}
+async function authAction(a,el){
+  if(a==='logout'){await sb.auth.signOut();try{localStorage.removeItem(storeKey())}catch(e){}user=null;profile=null;S={exps:[],notas:[],extras:[],ejemplos:false};lastKey=null;setA({mode:'login',err:'',ok:'',busy:false});return}
+  if(a==='auth-mode'){setA({mode:el.dataset.m,err:'',ok:'',pw:'',pw2:''});return}
+  if(a==='auth-google'){setA({busy:true,err:''});const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:SITE}});if(error)setA({busy:false,err:tErr(error)});return}
+  if(a==='auth-resend'){setA({busy:true,err:'',ok:''});const {error}=await sb.auth.resend({type:'signup',email:A.email,options:{emailRedirectTo:SITE}});setA({busy:false,err:error?tErr(error):'',ok:error?'':'Te enviamos un código nuevo.'});return}
+}
+async function authSubmit(k,g){
+  if(A.busy)return;
+  if(k==='auth-login'){
+    const email=g('a-email').value.trim(),password=g('a-pass').value;setA({email,pw:password,busy:true,err:'',ok:''});
+    const {error}=await sb.auth.signInWithPassword({email,password});
+    if(error&&/Email not confirmed/i.test(error.message)){await sb.auth.resend({type:'signup',email,options:{emailRedirectTo:SITE}});setA({busy:false,mode:'code',kind:'signup',err:'',ok:tErr(error)});return}
+    if(error)setA({busy:false,err:tErr(error)});
+  }else if(k==='auth-signup'){
+    const username=g('a-user').value.trim().toLowerCase(),email=g('a-email').value.trim(),password=g('a-pass').value;
+    const pw2=g('a-pass2').value;
+    if(password!==pw2){setA({email,user:username,pw:password,pw2,err:'Las contraseñas no coinciden.'});return}
+    setA({email,user:username,pw:password,pw2,busy:true,err:'',ok:''});
+    const av=await sb.rpc('username_available',{u:username});
+    if(av.error){setA({busy:false,err:tErr(av.error)});return}
+    if(!av.data){setA({busy:false,err:'Ese nombre de usuario ya está en uso. Elige otro.'});return}
+    const {data,error}=await sb.auth.signUp({email,password,options:{data:{username},emailRedirectTo:SITE}});
+    if(error){setA({busy:false,err:tErr(error)});return}
+    if(data.user&&Array.isArray(data.user.identities)&&data.user.identities.length===0){setA({busy:false,err:'Ese correo ya tiene una cuenta. Inicia sesión.'});return}
+    if(!data.session)setA({busy:false,mode:'code',kind:'signup',pw:'',pw2:''});
+  }else if(k==='auth-code'){
+    const token=g('a-code').value.trim();setA({busy:true,err:'',ok:''});
+    const {error}=await sb.auth.verifyOtp({email:A.email,token,type:'signup'});
+    if(error)setA({busy:false,err:tErr(error)});
+  }else if(k==='auth-forgot'){
+    const email=g('a-email').value.trim();setA({email,busy:true,err:''});
+    const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:SITE});
+    setA(error?{busy:false,err:tErr(error)}:{busy:false,mode:'reset'});
+  }else if(k==='auth-reset'){
+    const token=g('a-code').value.trim(),password=g('a-pass').value;setA({busy:true,err:''});
+    const v=await sb.auth.verifyOtp({email:A.email,token,type:'recovery'});
+    if(v.error){setA({busy:false,err:tErr(v.error)});return}
+    const u=await sb.auth.updateUser({password});
+    if(u.error){toast('No se pudo cambiar la contraseña: '+tErr(u.error))}else toast('Contraseña actualizada');
+  }
+}
+async function enterApp(session){
+  user=session.user;Object.assign(A,{busy:false,mode:'loading',pw:'',pw2:'',err:'',ok:''});renderAuth();
+  S={exps:[],notas:[],extras:[],ejemplos:false};
+  const [pr,ud]=await Promise.all([
+    sb.from('profiles').select('username').eq('id',user.id).maybeSingle(),
+    sb.from('user_data').select('data').eq('user_id',user.id).maybeSingle()
+  ]);
+  profile=pr.data||null;
+  if(ud.error){
+    if(!load()){A.mode='login';A.err='No se pudieron cargar tus datos: '+tErr(ud.error);user=null;await sb.auth.signOut();renderAuth();return}
+    sync='err';
+  }else if(ud.data&&ud.data.data&&Array.isArray(ud.data.data.exps)){
+    S=Object.assign(S,ud.data.data);try{localStorage.setItem(storeKey(),JSON.stringify(S))}catch(e){}
+  }else{
+    let legacy=null;try{legacy=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){}
+    if(legacy&&Array.isArray(legacy.exps)&&legacy.exps.some(e=>!e.ejemplo)){
+      const ids=new Set(legacy.exps.filter(e=>!e.ejemplo).map(e=>e.id));
+      S={exps:legacy.exps.filter(e=>!e.ejemplo),notas:(legacy.notas||[]).filter(n=>ids.has(n.exp)),extras:legacy.extras||[],ejemplos:false};
+      save();toast('Pasamos tus expedientes de este navegador a tu cuenta');
+    }else seed();
+  }
+  lastKey=null;ui.view='hoy';render();
+}
+function bootCloud(){
+  sb=window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseKey);
+  const hp=new URLSearchParams(location.hash.slice(1)+'&'+location.search.slice(1));
+  if(hp.get('error_description'))A.err='No se pudo entrar con Google: '+hp.get('error_description');
+  sb.auth.onAuthStateChange((ev,session)=>{
+    setTimeout(()=>{
+      if(session&&(!user||user.id!==session.user.id)){if(location.hash.includes('access_token'))history.replaceState(null,'',SITE);enterApp(session)}
+      else if(!session&&user){user=null;profile=null;setA({mode:'login'})}
+      else if(!session&&ev==='INITIAL_SESSION')renderAuth();
+    },0);
+  });
+  addEventListener('online',()=>{if(user&&sync==='err')queueSync()});
+}
+
 loadTema();applyTema();
-if(!load())seed();
-render();
+if(CLOUD&&!window.supabase){document.getElementById('app').innerHTML='<div class="auth"><div class="card auth-card"><h1>No se pudo conectar</h1><p class="lead">No se pudo cargar el sistema de cuentas. Revisa tu conexión a internet y recarga la página.</p></div></div>'}
+else if(CLOUD){bootCloud()}
+else{if(!load())seed();render()}
 })();
 </script>
 
