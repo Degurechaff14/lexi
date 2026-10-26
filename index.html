@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Lexi · Plazos civiles</title>
+<meta name="description" content="Lexi: agenda de plazos procesales civiles para asistentes legales y practicantes.">
+<meta name="theme-color" content="#1E3A8A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Crect x='2' y='2' width='40' height='40' rx='12' fill='%231E3A8A'/%3E%3Cg fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='11' y='13' width='22' height='19' rx='4'/%3E%3Cpath d='M11 19h22M17 10v5M27 10v5'/%3E%3Cpath d='M17.5 25.5l3.2 3.2 6-6.4' stroke-width='2.8'/%3E%3C/g%3E%3C/svg%3E">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: columna de trabajo con encabezado de marca, selector de tema y pestañas fijas. Cada plazo lleva una "hoja de calendario" con su último día, coloreada por urgencia. Tres paletas (Marino, Palo rosa, Petróleo), cada una con versión clara y oscura. */
+:root{
+  --bg:#F2F4F8; --surface:#FFFFFF; --ink:#131B2E; --muted:#5A6478; --line:#DCE1EA;
+  --accent:#1E3A8A; --accent-ink:#FFFFFF; --soft:#E6ECF8; --inhabil:#E9ECF2;
+  --red:#B3261E; --red-soft:#FBE4E2; --amber:#8A5300; --amber-soft:#FCEBCB;
+  --green:#176B3F; --green-soft:#DDF1E6; --shadow:rgba(19,27,46,.07);
+  --font-display:'Spectral',Georgia,'Times New Roman',serif;
+  --font-body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B1120; --surface:#141C2E; --ink:#E6EBF5; --muted:#98A3BA; --line:#263149;
+  --accent:#8FA8FF; --accent-ink:#0B1120; --soft:#1D2945; --inhabil:#18213A;
+  --red:#FF8E85; --red-soft:#4A1F1F; --amber:#F2B45A; --amber-soft:#3D2C10;
+  --green:#6FD39B; --green-soft:#17382A; --shadow:rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B1120; --surface:#141C2E; --ink:#E6EBF5; --muted:#98A3BA; --line:#263149;
+  --accent:#8FA8FF; --accent-ink:#0B1120; --soft:#1D2945; --inhabil:#18213A;
+  --red:#FF8E85; --red-soft:#4A1F1F; --amber:#F2B45A; --amber-soft:#3D2C10;
+  --green:#6FD39B; --green-soft:#17382A; --shadow:rgba(0,0,0,.35); color-scheme:dark}
+
+/* Palo rosa: rosa empolvado con acento palo de rosa, sobrio */
+:root[data-palette="rosa"]{
+  --bg:#FBF5F6; --surface:#FFFFFF; --ink:#2B1820; --muted:#6F5A63; --line:#EBDADF;
+  --accent:#9B3157; --accent-ink:#FFFFFF; --soft:#F7E6EB; --inhabil:#F1E7EA}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-palette="rosa"]{
+  --bg:#170F13; --surface:#22171C; --ink:#F5E8EC; --muted:#B8A0A9; --line:#3A2830;
+  --accent:#EE9FBA; --accent-ink:#170F13; --soft:#3A2130; --inhabil:#2A1D23}}
+:root[data-theme="dark"][data-palette="rosa"]{
+  --bg:#170F13; --surface:#22171C; --ink:#F5E8EC; --muted:#B8A0A9; --line:#3A2830;
+  --accent:#EE9FBA; --accent-ink:#170F13; --soft:#3A2130; --inhabil:#2A1D23}
+
+/* Petróleo: verde azulado profundo */
+:root[data-palette="petroleo"]{
+  --bg:#F1F5F4; --surface:#FFFFFF; --ink:#10231F; --muted:#55665F; --line:#D6E1DE;
+  --accent:#0E5C55; --accent-ink:#FFFFFF; --soft:#E1EFEC; --inhabil:#E7EDEB}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-palette="petroleo"]{
+  --bg:#0A1513; --surface:#12201D; --ink:#E3F0EC; --muted:#93A9A3; --line:#23362F;
+  --accent:#6FCDBF; --accent-ink:#0A1513; --soft:#183530; --inhabil:#172723}}
+:root[data-theme="dark"][data-palette="petroleo"]{
+  --bg:#0A1513; --surface:#12201D; --ink:#E3F0EC; --muted:#93A9A3; --line:#23362F;
+  --accent:#6FCDBF; --accent-ink:#0A1513; --soft:#183530; --inhabil:#172723}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--font-body);
+  padding-block:0 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  transition:background-color .35s,color .35s}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:18px;padding-top:22px}
+h1,h2,h3{font-family:var(--font-display);margin:0;text-wrap:balance;line-height:1.15;font-weight:600}
+h1{font-size:clamp(1.7rem,4.5vw,2.5rem);letter-spacing:-.01em}
+h2{font-size:1.35rem} h3{font-size:1.1rem}
+.ic{width:1.1em;height:1.1em;flex:none;vertical-align:-.18em}
+
+/* encabezado */
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.mark{width:46px;height:46px;flex:none;display:block;overflow:visible}
+.mark .pg{fill:var(--accent);transition:fill .35s}
+.mark .gl{fill:none;stroke:var(--accent-ink);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:stroke .35s}
+.mark .ck{stroke-width:2.8;stroke-dasharray:16;stroke-dashoffset:0;transition:stroke .35s,stroke-dashoffset .5s}
+.brand:hover .mark .ck{animation:draw .6s ease-out}
+@keyframes draw{from{stroke-dashoffset:16}to{stroke-dashoffset:0}}
+.name .i{position:relative;display:inline-block}
+.name .i i{position:absolute;left:50%;top:.02em;width:.21em;height:.21em;border-radius:50%;background:var(--accent);transform:translateX(-50%);transition:background-color .35s}
+.name{font:700 1.85rem/1 var(--font-body);letter-spacing:-.045em}
+.tag{font:500 .7rem var(--font-mono);color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.themes{display:flex;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px}
+.sw{display:flex;align-items:center;gap:7px;background:none;border:0;border-radius:999px;padding:6px 11px 6px 7px;color:var(--muted);font:500 .82rem var(--font-body);cursor:pointer;transition:background-color .2s,color .2s}
+.sw:hover{color:var(--ink);background:var(--soft)}
+.sw[aria-pressed="true"]{background:var(--soft);color:var(--ink);font-weight:600}
+.sw i{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--s1) 50%,var(--s2) 50%);box-shadow:0 0 0 1px var(--line)}
+.sw[aria-pressed="true"] i{box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--accent)}
+@media (max-width:560px){.sw .lbl{display:none}.sw{padding:7px}}
+
+/* navegación */
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:6px;transition:background-color .35s}
+.seg{display:flex;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow-x:auto;box-shadow:0 2px 10px var(--shadow)}
+.seg button{flex:1 0 auto;display:flex;align-items:center;justify-content:center;gap:8px;background:none;border:0;border-radius:10px;color:var(--muted);font:500 .92rem var(--font-body);padding:10px 14px;cursor:pointer;white-space:nowrap;transition:background-color .2s,color .2s}
+.seg button:hover{background:var(--soft);color:var(--ink)}
+.seg button[aria-current="page"]{background:var(--accent);color:var(--accent-ink);font-weight:600}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,.sw:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* avisos */
+.aviso{display:flex;gap:10px;align-items:flex-start;background:var(--amber-soft);color:var(--ink);border-radius:12px;padding:11px 14px;font-size:.86rem}
+.aviso .ic{color:var(--amber);margin-top:2px}
+.aviso strong{color:var(--amber)}
+.notice{background:var(--surface);border:1px solid var(--line)}
+.ejemplos{background:var(--soft);border-radius:12px;padding:10px 14px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:.9rem}
+
+/* base */
+.view{display:flex;flex-direction:column;gap:22px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0;box-shadow:0 1px 3px var(--shadow);transition:background-color .35s,border-color .35s,box-shadow .2s,transform .2s}
+.stack{display:flex;flex-direction:column;gap:12px}
+.stack-sm{display:flex;flex-direction:column;gap:6px;min-width:0}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.muted{color:var(--muted)} .small{font-size:.86rem}
+.mono{font-family:var(--font-mono);font-size:.82rem;overflow-wrap:anywhere;color:var(--muted)}
+.chip{display:inline-block;font:500 .7rem var(--font-mono);padding:3px 8px;border-radius:6px;background:var(--soft);color:var(--ink);letter-spacing:.03em}
+.chip.ej{background:var(--inhabil);color:var(--muted)}
+.badge{display:inline-flex;align-items:center;gap:5px;font:600 .76rem var(--font-body);padding:4px 10px;border-radius:999px;white-space:nowrap}
+.badge.red{background:var(--red-soft);color:var(--red)} .badge.amber{background:var(--amber-soft);color:var(--amber)}
+.badge.calm{background:var(--soft);color:var(--ink)} .badge.done{background:var(--green-soft);color:var(--green)}
+.badge.late{background:var(--red);color:var(--surface)}
+.btn{display:inline-flex;align-items:center;gap:7px;font:600 .9rem var(--font-body);border-radius:10px;padding:10px 16px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer;transition:background-color .2s,color .2s,border-color .2s,transform .12s,box-shadow .2s}
+.btn:hover{box-shadow:0 4px 14px var(--shadow)}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{background:var(--soft);border-color:var(--soft)}
+.btn.danger{background:transparent;color:var(--red);border-color:var(--red)}
+.btn.danger:hover{background:var(--red-soft)}
+.btn.danger.armed{background:var(--red);color:var(--surface)}
+.btn.sm{padding:6px 11px;font-size:.8rem;border-radius:8px}
+label{display:flex;flex-direction:column;gap:5px;font-size:.85rem;font-weight:500}
+input,select,textarea{font:400 .95rem var(--font-body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;min-width:0;transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--soft);outline:none}
+input[type="checkbox"]{width:18px;height:18px;flex:none;accent-color:var(--accent);margin:3px 0 0;cursor:pointer}
+textarea{resize:vertical;min-height:70px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.note-text{white-space:pre-wrap;overflow-wrap:anywhere}
+.done-text{text-decoration:line-through;color:var(--muted)}
+.sect{display:flex;flex-direction:column;gap:10px}
+.sect-h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.sect-h small{font:400 .88rem var(--font-body);color:var(--muted);text-transform:capitalize}
+.count{font:500 .72rem var(--font-mono);color:var(--muted);background:var(--inhabil);border-radius:999px;padding:2px 8px}
+.empty{border:1.5px dashed var(--line);border-radius:14px;padding:16px;color:var(--muted);font-size:.9rem}
+
+/* hoy: portada y cifras */
+.hero{display:flex;flex-direction:column;gap:6px}
+.hero .eyebrow{font:500 .72rem var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.hero h1{text-transform:capitalize}
+.hero p{margin:0;color:var(--muted);max-width:60ch}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.stat{display:flex;flex-direction:column;gap:2px;padding:14px 16px}
+.stat .l{font:500 .68rem var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.stat .n{font:600 2.1rem/1.1 var(--font-display);font-variant-numeric:tabular-nums}
+.stat .s{font-size:.78rem;color:var(--muted)}
+.stat.alert{background:var(--red-soft);border-color:transparent}
+.stat.alert .n,.stat.alert .l{color:var(--red)}
+.stat.warm .n{color:var(--accent)}
+@media (max-width:620px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* tarjeta con hoja de calendario */
+.item{display:grid;grid-template-columns:64px minmax(0,1fr);gap:14px;align-items:start}
+.item:hover{box-shadow:0 8px 24px var(--shadow);transform:translateY(-2px)}
+.item .title{font-weight:600;font-size:1rem}
+.item .head{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.leaf{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:11px;padding:8px 4px;min-height:74px;text-align:center;line-height:1;background:var(--soft);color:var(--accent)}
+.leaf .m{font:500 .64rem var(--font-mono);letter-spacing:.1em;text-transform:uppercase}
+.leaf .d{font:600 1.75rem var(--font-display);margin:4px 0 3px;font-variant-numeric:tabular-nums}
+.leaf .w{font:500 .7rem var(--font-body);text-transform:capitalize;opacity:.85}
+.leaf.u-red{background:var(--red-soft);color:var(--red)}
+.leaf.u-amber{background:var(--amber-soft);color:var(--amber)}
+.leaf.u-done{background:var(--green-soft);color:var(--green)}
+.leaf.u-late{background:var(--red);color:var(--surface)}
+.leaf.u-note{background:var(--inhabil);color:var(--muted)}
+.leaf.u-note .ic{width:22px;height:22px;margin-bottom:5px}
+.check{display:flex;gap:10px;align-items:flex-start}
+.big .leaf{min-height:96px}
+.big .leaf .d{font-size:2.3rem}
+@media (max-width:420px){.item{grid-template-columns:54px minmax(0,1fr);gap:11px}.leaf .d{font-size:1.45rem}}
+
+/* calendario */
+.calhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.calhead .month{font:600 1.3rem var(--font-display);text-transform:capitalize}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.dow{font:500 .68rem var(--font-mono);color:var(--muted);text-align:center;text-transform:uppercase;letter-spacing:.06em;padding-bottom:4px}
+.cell{min-height:60px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:5px;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;cursor:pointer;font:inherit;text-align:left;transition:border-color .15s,background-color .15s,transform .15s}
+.cell:hover{border-color:var(--accent);transform:translateY(-1px)}
+.cell .d{font:500 .82rem var(--font-mono);width:24px;height:24px;display:grid;place-items:center;border-radius:50%}
+.cell.out{opacity:.38}
+.cell.inh{background:var(--inhabil);color:var(--muted)}
+.cell.today .d{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.cell.sel{background:var(--soft);border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.dots{display:flex;gap:3px;flex-wrap:wrap;padding-left:2px}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.dot.red{background:var(--red)} .dot.amber{background:var(--amber)} .dot.done{background:var(--green)} .dot.note{background:var(--muted)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);margin-top:12px}
+.legend span{display:flex;gap:6px;align-items:center}
+.panel{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.panel h3{text-transform:capitalize}
+
+/* barras por materia */
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:90px minmax(0,1fr) 74px;gap:12px;align-items:center;font-size:.9rem}
+.track{height:10px;background:var(--inhabil);border-radius:999px;overflow:hidden}
+.fill{height:100%;background:var(--accent);border-radius:999px;transform-origin:left}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 .7rem var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+td.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+details summary{cursor:pointer;font-weight:600}
+.foot{font-size:.78rem;color:var(--muted);text-align:center;padding-top:8px}
+
+/* aviso flotante */
+#toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,16px);opacity:0;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font:500 .88rem var(--font-body);pointer-events:none;z-index:20;max-width:calc(100% - 32px);box-shadow:0 10px 30px var(--shadow);display:flex;gap:8px;align-items:center;transition:opacity .25s,transform .25s}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion:no-preference){
+  .enter>*,.enter>.stack>*{animation:rise .42s cubic-bezier(.2,.7,.2,1) both}
+  .enter>*:nth-child(2),.enter>.stack>*:nth-child(2){animation-delay:.05s}
+  .enter>*:nth-child(3),.enter>.stack>*:nth-child(3){animation-delay:.1s}
+  .enter>*:nth-child(4),.enter>.stack>*:nth-child(4){animation-delay:.15s}
+  .enter>*:nth-child(5),.enter>.stack>*:nth-child(5){animation-delay:.2s}
+  .enter>*:nth-child(n+6),.enter>.stack>*:nth-child(n+6){animation-delay:.25s}
+  .enter .fill{animation:grow .7s .2s cubic-bezier(.2,.7,.2,1) both}
+  .enter .stat .n{animation:rise .5s .1s both}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+}
+@media (prefers-reduced-motion:reduce){.item:hover,.cell:hover{transform:none}#toast{transition:none}}
+@media (max-width:480px){.bar{grid-template-columns:72px minmax(0,1fr) 60px}.cell{min-height:50px;padding:3px}.cell .d{width:22px;height:22px;font-size:.76rem}.seg button{padding:9px 11px;font-size:.86rem}.seg button .ic{display:none}}
+</style>
+
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+//#core-start
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parse=s=>{const p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2],12)};
+const addDays=(s,n)=>{const d=parse(s);d.setDate(d.getDate()+n);return iso(d)};
+const todayISO=()=>iso(new Date());
+const diffDays=(a,b)=>Math.round((parse(b)-parse(a))/864e5);
+const FERIADOS={
+ '2026-01-01':'Año Nuevo','2026-04-02':'Jueves Santo','2026-04-03':'Viernes Santo','2026-05-01':'Día del Trabajo',
+ '2026-06-07':'Batalla de Arica y Día de la Bandera','2026-06-29':'San Pedro y San Pablo','2026-07-23':'Día de la Fuerza Aérea',
+ '2026-07-28':'Fiestas Patrias','2026-07-29':'Fiestas Patrias','2026-08-06':'Batalla de Junín','2026-08-30':'Santa Rosa de Lima',
+ '2026-10-08':'Combate de Angamos','2026-11-01':'Todos los Santos','2026-12-08':'Inmaculada Concepción','2026-12-09':'Batalla de Ayacucho','2026-12-25':'Navidad',
+ '2027-01-01':'Año Nuevo','2027-03-25':'Jueves Santo','2027-03-26':'Viernes Santo','2027-05-01':'Día del Trabajo',
+ '2027-06-07':'Batalla de Arica y Día de la Bandera','2027-06-29':'San Pedro y San Pablo','2027-07-23':'Día de la Fuerza Aérea',
+ '2027-07-28':'Fiestas Patrias','2027-07-29':'Fiestas Patrias','2027-08-06':'Batalla de Junín','2027-08-30':'Santa Rosa de Lima',
+ '2027-10-08':'Combate de Angamos','2027-11-01':'Todos los Santos','2027-12-08':'Inmaculada Concepción','2027-12-09':'Batalla de Ayacucho','2027-12-25':'Navidad'
+};
+const LAST_COVERED='2027-12-31';
+const ACTOS={
+ contestacion:{label:'Contestar demanda',proceso:true,dias:{conocimiento:30,abreviado:10,sumarisimo:5}},
+ apel_sentencia:{label:'Apelar sentencia',proceso:true,dias:{conocimiento:10,abreviado:10,sumarisimo:5}},
+ apel_auto:{label:'Apelar auto',proceso:false,dias:3},
+ casacion:{label:'Recurso de casación',proceso:false,dias:10},
+ otro:{label:'Otro acto (fecha manual)',manual:true}
+};
+const PROCESOS={conocimiento:'Conocimiento',abreviado:'Abreviado',sumarisimo:'Sumarísimo'};
+let S={exps:[],notas:[],extras:[],ejemplos:false};
+function motivoInhabil(d){
+  const w=parse(d).getDay();
+  if(w===0)return 'domingo'; if(w===6)return 'sábado';
+  if(FERIADOS[d])return 'feriado: '+FERIADOS[d];
+  const x=S.extras.find(e=>e.fecha===d); if(x)return 'inhábil: '+x.motivo;
+  return null;
+}
+function diasDe(e){const a=ACTOS[e.acto];if(a.manual)return null;return a.proceso?a.dias[e.proceso]:a.dias}
+function calcPlazo(notif,n){
+  let d=notif,c=0,sk=[],first=null;
+  while(c<n){d=addDays(d,1);const r=motivoInhabil(d);if(r)sk.push({fecha:d,motivo:r});else{c++;if(c===1)first=d}}
+  return {venc:d,dias:n,saltados:sk,primero:first,fuera:d>LAST_COVERED};
+}
+//#core-end
+
+const KEY='lexi.v1',TKEY='lexi.tema';
+const MATERIAS=['Civil','Penal','Familia','Laboral','Notarial'];
+const PALETAS=[['marino','Marino','#1E3A8A','#8FA8FF'],['rosa','Palo rosa','#9B3157','#EE9FBA'],['petroleo','Petróleo','#0E5C55','#6FCDBF']];
+const ui={view:'hoy',detail:null,showForm:false,cal:{},sel:{},confirm:null};
+const pc=new Map();
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let saveFailed=false,lastKey=null,tema='marino',toastT=null;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));saveFailed=false}catch(e){saveFailed=true}}
+function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&Array.isArray(o.exps))S=Object.assign(S,o);return true}}catch(e){}return false}
+function loadTema(){try{const t=localStorage.getItem(TKEY);if(PALETAS.some(p=>p[0]===t))tema=t}catch(e){}}
+function applyTema(){document.documentElement.setAttribute('data-palette',tema)}
+function toast(msg){const el=document.getElementById('toast');el.innerHTML=ic('check')+'<span>'+esc(msg)+'</span>';el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2200)}
+
+const ICONS={
+ hoy:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+ cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+ exp:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+ reglas:'<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19M9 7h6M9 11h4"/>',
+ info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+ note:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
+ prev:'<path d="M15 6l-6 6 6 6"/>',next:'<path d="M9 6l6 6-6 6"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+ open:'<path d="M7 17L17 7M9 7h8v8"/>',back:'<path d="M19 12H5M11 6l-6 6 6 6"/>',undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>'
+};
+const ic=n=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICONS[n]+'</svg>';
+
+function plazo(e){
+  if(pc.has(e.id))return pc.get(e.id);
+  let p;
+  if(ACTOS[e.acto].manual)p={venc:e.fechaManual,dias:null,saltados:[],manual:true};
+  else p=calcPlazo(e.notif,diasDe(e));
+  pc.set(e.id,p);return p;
+}
+const fLarga=s=>parse(s).toLocaleDateString('es-PE',{weekday:'long',day:'numeric',month:'long'});
+const fCorta=s=>parse(s).toLocaleDateString('es-PE',{weekday:'short',day:'numeric',month:'short'});
+const fMes=ym=>parse(ym+'-01').toLocaleDateString('es-PE',{month:'long',year:'numeric'});
+function urg(e,p){
+  if(e.estado==='presentado')return {k:'done',txt:'Presentado'};
+  const n=diffDays(todayISO(),p.venc);
+  if(n<0)return {k:'late',txt:'Vencido hace '+(-n)+(n===-1?' día':' días')};
+  if(n===0)return {k:'red',txt:'Vence hoy'};
+  if(n===1)return {k:'red',txt:'Vence mañana'};
+  if(n<=5)return {k:'amber',txt:'Vence en '+n+' días'};
+  return {k:'calm',txt:'Vence en '+n+' días'};
+}
+function actoTxt(e){const a=ACTOS[e.acto];return e.acto==='otro'?(e.descripcion||a.label):a.label+(a.proceso?' · '+PROCESOS[e.proceso]:'')}
+function leaf(date,k){
+  const d=parse(date),cl=s=>s.replace('.','');
+  return '<div class="leaf u-'+k+'" aria-hidden="true"><span class="m">'+cl(d.toLocaleDateString('es-PE',{month:'short'}))+'</span><span class="d">'+d.getDate()+'</span><span class="w">'+cl(d.toLocaleDateString('es-PE',{weekday:'short'}))+'</span></div>';
+}
+function expHead(e){return '<div class="head"><span class="mono">'+esc(e.numero)+'</span><span class="row" style="gap:6px"><span class="chip">'+esc(e.materia)+'</span>'+(e.ejemplo?'<span class="chip ej">Ejemplo</span>':'')+'</span></div>'}
+
+function itemsOn(date,fid){
+  const out=[];
+  for(const e of S.exps){if(fid&&e.id!==fid)continue;const p=plazo(e);if(p.venc===date)out.push({t:'plazo',e,p})}
+  for(const n of S.notas){if(n.fecha!==date)continue;const e=S.exps.find(x=>x.id===n.exp);if(!e||(fid&&e.id!==fid))continue;out.push({t:'nota',e,n})}
+  return out;
+}
+function presBtn(e){const done=e.estado==='presentado';return '<button class="btn '+(done?'ghost':'')+' sm" data-action="togglepres" data-id="'+e.id+'">'+ic(done?'undo':'check')+(done?'Volver a pendiente':'Marcar presentado')+'</button>'}
+function itemCard(it){
+  const e=it.e;
+  if(it.t==='plazo'){
+    const u=urg(e,it.p),done=e.estado==='presentado';
+    return '<article class="card item">'+leaf(it.p.venc,u.k)+'<div class="stack-sm">'+expHead(e)+
+      '<div class="row between"><span class="title'+(done?' done-text':'')+'">'+esc(actoTxt(e))+'</span><span class="badge '+u.k+'">'+u.txt+'</span></div>'+
+      '<div class="small muted">Último día: '+fCorta(it.p.venc)+(it.p.dias?' · '+it.p.dias+' días hábiles desde la notificación del '+fCorta(e.notif):' · fecha puesta a mano')+'</div>'+
+      '<div class="row" style="gap:8px;margin-top:4px">'+presBtn(e)+'<button class="btn ghost sm" data-action="open" data-id="'+e.id+'">'+ic('open')+'Abrir expediente</button></div></div></article>';
+  }
+  const n=it.n;
+  return '<article class="card item"><div class="leaf u-note" aria-hidden="true">'+ic('note')+'<span class="m">Nota</span></div><div class="stack-sm">'+expHead(e)+
+    '<div class="check"><input type="checkbox" id="nt-'+n.id+'" data-action="togglenote" data-id="'+n.id+'"'+(n.hecho?' checked':'')+' aria-label="Marcar nota como hecha"><label for="nt-'+n.id+'" class="note-text'+(n.hecho?' done-text':'')+'" style="font-weight:400;font-size:.95rem;display:block;cursor:pointer">'+esc(n.texto)+'</label></div></div></article>';
+}
+
+/* ---------- vistas ---------- */
+function vHoy(){
+  const t=todayISO(),m=addDays(t,1);
+  const sec=(titulo,sub,items,vacio)=>'<section class="sect"><div class="sect-h"><h2>'+titulo+'</h2>'+(sub?'<small>'+sub+'</small>':'')+(items.length?'<span class="count">'+items.length+'</span>':'')+'</div>'+(items.length?items.map(itemCard).join(''):'<div class="empty">'+vacio+'</div>')+'</section>';
+  const late=S.exps.filter(e=>e.estado!=='presentado'&&plazo(e).venc<t).map(e=>({t:'plazo',e,p:plazo(e)}));
+  const hoy=itemsOn(t),man=itemsOn(m);
+  const prox=[];for(let i=2;i<=7;i++)prox.push(...itemsOn(addDays(t,i)));
+  const urgentes=hoy.concat(man).filter(x=>x.t==='plazo'&&x.e.estado!=='presentado').length;
+  let h='<section class="hero"><span class="eyebrow">Tu día</span><h1>'+fLarga(t)+'</h1><p>'+
+    (urgentes?'Tienes '+urgentes+(urgentes===1?' plazo por presentar':' plazos por presentar')+' entre hoy y mañana.':'Nada de lo que cargaste vence hoy ni mañana.')+
+    (late.length?' Además hay '+late.length+(late.length===1?' plazo vencido':' plazos vencidos')+' sin marcar como presentado.':'')+'</p></section>';
+  const st=(l,n,s,cls)=>'<div class="card stat'+(cls?' '+cls:'')+'"><span class="l">'+l+'</span><span class="n">'+n+'</span><span class="s">'+s+'</span></div>';
+  h+='<div class="stats">'+st('Vencidos',late.length,'sin presentar',late.length?'alert':'')+st('Hoy',hoy.length,'plazos y notas',hoy.length?'warm':'')+st('Mañana',man.length,'plazos y notas',man.length?'warm':'')+st('7 días',prox.length,'después de mañana','')+'</div>';
+  if(S.ejemplos)h+='<div class="ejemplos"><span>Estás viendo expedientes de ejemplo para que pruebes Lexi.</span><button class="btn ghost sm" data-action="clearex">Borrar ejemplos</button></div>';
+  if(late.length)h+='<section class="sect"><div class="sect-h"><h2>Vencidos sin presentar</h2><span class="count">'+late.length+'</span></div>'+late.map(itemCard).join('')+'</section>';
+  h+=sec('Hoy','',hoy,'No cargaste plazos ni notas para hoy. Si tienes algo pendiente y no aparece, falta cargarlo.');
+  h+=sec('Mañana',fLarga(m),man,'No cargaste plazos ni notas para mañana.');
+  h+=sec('Próximos 7 días','',prox,'Nada cargado para los siguientes días.');
+  return h;
+}
+
+function shiftMonth(ym,k){const p=ym.split('-').map(Number);return iso(new Date(p[0],p[1]-1+k,1,12)).slice(0,7)}
+function calendar(key,fid){
+  const t=todayISO(),ym=ui.cal[key]||t.slice(0,7),sel=ui.sel[key]||t;
+  const first=ym+'-01',off=(parse(first).getDay()+6)%7,start=addDays(first,-off);
+  let cells='';
+  for(let i=0;i<42;i++){
+    const d=addDays(start,i),inM=d.slice(0,7)===ym,its=itemsOn(d,fid),mi=motivoInhabil(d);
+    let dots='';
+    for(const it of its.slice(0,6)){
+      if(it.t==='plazo'){const u=urg(it.e,it.p);dots+='<span class="dot '+(u.k==='late'?'red':u.k==='calm'?'':u.k)+'"></span>'}
+      else dots+='<span class="dot note"></span>';
+    }
+    cells+='<button class="cell'+(inM?'':' out')+(mi?' inh':'')+(d===t?' today':'')+(d===sel?' sel':'')+'" data-action="selday" data-key="'+key+'" data-date="'+d+'" title="'+esc(mi||'')+'" aria-label="'+esc(fLarga(d)+(mi?' ('+mi+')':'')+(its.length?', '+its.length+' elementos':''))+'"'+(d===sel?' aria-pressed="true"':'')+'><span class="d">'+parseInt(d.slice(8),10)+'</span><span class="dots">'+dots+'</span></button>';
+  }
+  const dows=['lun','mar','mié','jue','vie','sáb','dom'].map(x=>'<div class="dow">'+x+'</div>').join('');
+  const its=itemsOn(sel,fid),mi=motivoInhabil(sel);
+  const panel='<div class="stack panel"><h3>'+fLarga(sel)+'</h3>'+
+    (mi?'<div class="small muted">Día inhábil ('+esc(mi)+'). Los plazos no corren en este día.</div>':'')+
+    (its.length?its.map(itemCard).join(''):'<div class="empty">Sin plazos ni notas este día.</div>')+
+    noteForm(key,fid)+'</div>';
+  return '<div class="card"><div class="calhead"><div class="month">'+fMes(ym)+'</div><div class="row" style="gap:6px">'+
+    '<button class="btn ghost sm" data-action="calnav" data-key="'+key+'" data-delta="-1" aria-label="Mes anterior">'+ic('prev')+'</button>'+
+    '<button class="btn ghost sm" data-action="calnav" data-key="'+key+'" data-delta="0">Hoy</button>'+
+    '<button class="btn ghost sm" data-action="calnav" data-key="'+key+'" data-delta="1" aria-label="Mes siguiente">'+ic('next')+'</button></div></div>'+
+    '<div class="cal">'+dows+cells+'</div>'+
+    '<div class="legend"><span><i class="dot red"></i>Vence hoy o mañana</span><span><i class="dot amber"></i>Próximo</span><span><i class="dot"></i>Plazo</span><span><i class="dot done"></i>Presentado</span><span><i class="dot note"></i>Nota</span></div>'+panel+'</div>';
+}
+function noteForm(key,fid){
+  if(!S.exps.length)return '<div class="small muted">Carga un expediente para poder añadir notas.</div>';
+  const sel=fid?'':'<label>Expediente<select id="nf-exp-'+key+'">'+S.exps.map(e=>'<option value="'+e.id+'">'+esc(e.numero)+'</option>').join('')+'</select></label>';
+  return '<form data-form="addnote" data-key="'+key+'" data-fid="'+(fid||'')+'" class="stack" style="border-top:1px solid var(--line);padding-top:14px">'+sel+
+    '<label>Nueva nota para este día<textarea id="nf-text-'+key+'" required maxlength="400" placeholder="Ej.: adjuntar anexos 1-A y 1-B, revisar con el abogado"></textarea></label>'+
+    '<div class="small muted">Escribe solo lo que necesitas hacer. No pongas nombres de clientes ni datos personales.</div>'+
+    '<div><button class="btn" type="submit">'+ic('plus')+'Guardar nota</button></div></form>';
+}
+function vCal(){
+  return '<div class="stack"><div class="hero"><span class="eyebrow">Vista general</span><h1>Calendario</h1><p>Plazos y notas de todos tus expedientes. Los días grises son inhábiles.</p></div>'+calendar('main',null)+'</div>';
+}
+
+function vExp(){
+  const counts=MATERIAS.map(m=>({m,n:S.exps.filter(e=>e.materia===m).length}));
+  const max=Math.max(1,...counts.map(c=>c.n));
+  const pend=S.exps.filter(e=>e.estado!=='presentado').length;
+  let h='<div class="stack"><div class="row between" style="align-items:flex-end"><div class="hero"><span class="eyebrow">'+S.exps.length+' cargados · '+pend+' pendientes</span><h1>Expedientes</h1></div><button class="btn" data-action="toggleform">'+(ui.showForm?'Cerrar':ic('plus')+'Nuevo expediente')+'</button></div>';
+  if(ui.showForm)h+=formNuevo();
+  h+='<div class="card stack"><h3>Por materia</h3><div class="bars">'+counts.map(c=>'<div class="bar"><span>'+c.m+'</span><div class="track" role="img" aria-label="'+c.m+': '+c.n+'"><div class="fill" style="width:'+(c.n/max*100)+'%"></div></div><span class="small muted">'+(c.m==='Civil'?c.n:c.n+' · pronto')+'</span></div>').join('')+'</div>'+
+    '<div class="small muted">Por ahora solo está la materia Civil.</div></div>';
+  const list=S.exps.slice().sort((a,b)=>plazo(a).venc<plazo(b).venc?-1:1);
+  h+=list.length?list.map(e=>{const p=plazo(e),u=urg(e,p);
+    return '<article class="card item">'+leaf(p.venc,u.k)+'<div class="stack-sm">'+expHead(e)+
+    '<div class="row between"><span class="title">'+esc(actoTxt(e))+'</span><span class="badge '+u.k+'">'+u.txt+'</span></div>'+
+    '<div class="small muted">Último día: '+fCorta(p.venc)+'</div><div style="margin-top:4px"><button class="btn ghost sm" data-action="open" data-id="'+e.id+'">'+ic('open')+'Abrir</button></div></div></article>'}).join(''):'<div class="empty">Aún no tienes expedientes. Pulsa "Nuevo expediente".</div>';
+  return h+'</div>';
+}
+function formNuevo(){
+  return '<form class="card stack" data-form="nuevo" id="f-nuevo">'+
+  '<h3>Nuevo expediente</h3>'+
+  '<div class="aviso">'+ic('info')+'<span><strong>Usa solo el número de expediente.</strong> No escribas nombres de clientes ni datos personales. Los datos se guardan únicamente en este navegador.</span></div>'+
+  '<div class="grid2"><label>Número de expediente<input id="f-num" required maxlength="40" placeholder="00000-2026-0-1801-JR-CI-00" autocomplete="off"></label>'+
+  '<label>Materia<select id="f-mat">'+MATERIAS.map(m=>'<option'+(m==='Civil'?'':' disabled')+'>'+m+(m==='Civil'?'':' (próximamente)')+'</option>').join('')+'</select></label></div>'+
+  '<div class="grid2"><label>Acto que debes presentar<select id="f-acto">'+Object.keys(ACTOS).map(k=>'<option value="'+k+'">'+ACTOS[k].label+'</option>').join('')+'</select></label>'+
+  '<label id="w-proc">Tipo de proceso<select id="f-proc">'+Object.keys(PROCESOS).map(k=>'<option value="'+k+'">'+PROCESOS[k]+'</option>').join('')+'</select></label></div>'+
+  '<div class="grid2"><label id="w-notif">Fecha de notificación<input type="date" id="f-notif" value="'+todayISO()+'"></label>'+
+  '<label id="w-man" hidden>Fecha límite<input type="date" id="f-man"></label></div>'+
+  '<label id="w-desc" hidden>Descripción corta del acto<input id="f-desc" maxlength="60" placeholder="Ej.: absolver traslado"></label>'+
+  '<div class="card" id="f-prev" aria-live="polite" style="background:var(--soft);border-color:transparent;box-shadow:none"></div>'+
+  '<div class="row"><button class="btn" type="submit">'+ic('check')+'Guardar expediente</button><button class="btn ghost" type="button" data-action="toggleform">Cancelar</button></div></form>';
+}
+function formPrev(){
+  const g=id=>document.getElementById(id);if(!g('f-acto'))return;
+  const acto=g('f-acto').value,a=ACTOS[acto];
+  g('w-proc').hidden=!a.proceso;g('w-notif').hidden=!!a.manual;g('w-man').hidden=!a.manual;g('w-desc').hidden=!a.manual;
+  const box=g('f-prev');
+  if(a.manual){box.innerHTML='<span class="small">Lexi mostrará la fecha que escribas. No calcula este acto.</span>';return}
+  const nt=g('f-notif').value;if(!nt){box.textContent='Elige la fecha de notificación.';return}
+  const n=a.proceso?a.dias[g('f-proc').value]:a.dias,p=calcPlazo(nt,n);
+  box.innerHTML='<div class="item" style="box-shadow:none">'+leaf(p.venc,'calm')+'<div class="stack-sm"><div class="title" style="text-transform:none">Último día: '+esc(fLarga(p.venc))+'</div><div class="small muted">'+n+' días hábiles contados desde el día siguiente a la notificación. Se saltan '+p.saltados.length+' días inhábiles.'+(p.fuera?' Atención: este plazo pasa de 2027 y Lexi aún no tiene los feriados de ese año.':'')+' Confirma siempre la fecha en el sistema del Poder Judicial.</div></div></div>';
+}
+
+function vDet(){
+  const e=S.exps.find(x=>x.id===ui.detail);
+  if(!e)return '<div class="empty">Ese expediente ya no existe. <button class="btn ghost sm" data-action="goexp">Volver</button></div>';
+  const p=plazo(e),u=urg(e,p),done=e.estado==='presentado';
+  const notas=S.notas.filter(n=>n.exp===e.id).sort((a,b)=>a.fecha<b.fecha?-1:1);
+  const sk=p.saltados.length?'<details><summary>Cómo se contó este plazo</summary><div class="small stack" style="margin-top:8px"><div>Notificado el '+esc(fCorta(e.notif))+'. El día 1 es el '+esc(fCorta(p.primero))+'. Días que no cuentan:</div><ul style="margin:0;padding-left:18px">'+p.saltados.map(s=>'<li>'+esc(fCorta(s.fecha))+' ('+esc(s.motivo)+')</li>').join('')+'</ul></div></details>':'';
+  return '<div class="stack"><div><button class="btn ghost sm" data-action="goexp">'+ic('back')+'Expedientes</button></div>'+
+  '<div class="card item big" style="transform:none">'+leaf(p.venc,u.k)+'<div class="stack">'+expHead(e)+
+  '<h1 style="font-size:clamp(1.4rem,3.5vw,1.9rem)"'+(done?' class="done-text"':'')+'>'+esc(actoTxt(e))+'</h1>'+
+  '<div class="row"><span class="badge '+u.k+'">'+u.txt+'</span><span>Último día: <strong style="text-transform:capitalize">'+esc(fLarga(p.venc))+'</strong></span></div>'+
+  (p.dias?'<div class="small muted">'+p.dias+' días hábiles desde la notificación del '+esc(fCorta(e.notif))+'.'+(p.fuera?' Este plazo pasa de 2027 y faltan feriados de ese año.':'')+'</div>':'')+sk+
+  '<div class="aviso">'+ic('info')+'<span>Lexi es una ayuda. La fecha oficial se verifica siempre en el sistema del Poder Judicial.</span></div>'+
+  '<div class="row" style="gap:8px">'+presBtn(e)+
+  '<button class="btn danger sm'+(ui.confirm===e.id?' armed':'')+'" data-action="del" data-id="'+e.id+'">'+(ui.confirm===e.id?'Confirmar: eliminar con sus notas':'Eliminar expediente')+'</button></div></div></div>'+
+  '<h2>Calendario del expediente</h2>'+calendar('det',e.id)+
+  '<div class="card stack"><h3>Todas las notas</h3>'+(notas.length?notas.map(n=>'<div class="row between" style="align-items:flex-start;flex-wrap:nowrap"><div class="check"><input type="checkbox" id="na-'+n.id+'" data-action="togglenote" data-id="'+n.id+'"'+(n.hecho?' checked':'')+' aria-label="Marcar nota como hecha"><div><div class="mono">'+esc(fCorta(n.fecha))+'</div><div class="note-text'+(n.hecho?' done-text':'')+'">'+esc(n.texto)+'</div></div></div><button class="btn ghost sm" data-action="delnote" data-id="'+n.id+'" aria-label="Eliminar nota">Quitar</button></div>').join(''):'<div class="empty">Sin notas todavía. Elige un día del calendario para añadir una.</div>')+'</div></div>';
+}
+
+function vReglas(){
+  const rows=[['Contestar demanda','Conocimiento 30 · Abreviado 10 · Sumarísimo 5'],['Apelar sentencia','Conocimiento 10 · Abreviado 10 · Sumarísimo 5'],['Apelar auto','3'],['Recurso de casación','10']];
+  const fer=Object.keys(FERIADOS).sort();
+  return '<div class="stack"><div class="hero"><span class="eyebrow">Materia civil</span><h1>Reglas de plazos</h1></div>'+
+  '<div class="aviso">'+ic('info')+'<span><strong>Pendiente de validación jurídica.</strong> Estas reglas (materia civil) se tomaron de guías públicas y de la Ley 31591, no del texto del Código Procesal Civil. Un abogado debe revisarlas antes de que alguien confíe en las fechas.</span></div>'+
+  '<div class="card scroll"><table><thead><tr><th>Acto</th><th>Días hábiles</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+r[0]+'</td><td class="num">'+r[1]+'</td></tr>').join('')+'</tbody></table></div>'+
+  '<div class="small muted">El conteo empieza el día siguiente a la notificación y solo cuenta días hábiles. Si la notificación es electrónica, ingresa la fecha en que surte efectos.</div>'+
+  '<h2 style="margin-top:10px">Días inhábiles extra</h2><div class="small muted">Agrega aquí los días que el Poder Judicial declare inhábiles (decretos, paros, cierres). Un día no laborable del sector público no siempre aplica a los juzgados: confirma antes de agregarlo. Los plazos ya cargados se recalculan solos.</div>'+
+  '<form class="card stack" data-form="inhabil"><div class="grid2"><label>Fecha<input type="date" id="x-fecha" required></label><label>Motivo<input id="x-mot" required maxlength="60" placeholder="Ej.: resolución administrativa del PJ"></label></div><div><button class="btn" type="submit">'+ic('plus')+'Agregar día inhábil</button></div></form>'+
+  (S.extras.length?'<div class="card stack">'+S.extras.slice().sort((a,b)=>a.fecha<b.fecha?-1:1).map(x=>'<div class="row between"><span><span class="mono">'+esc(fCorta(x.fecha))+'</span> · '+esc(x.motivo)+'</span><button class="btn ghost sm" data-action="delx" data-fecha="'+x.fecha+'">Quitar</button></div>').join('')+'</div>':'')+
+  '<details class="card"><summary>Feriados nacionales cargados (2026 y 2027)</summary><div class="scroll"><table style="margin-top:8px"><tbody>'+fer.map(d=>'<tr><td class="mono">'+esc(fCorta(d))+'</td><td>'+esc(FERIADOS[d])+'</td></tr>').join('')+'</tbody></table></div><div class="small muted" style="margin-top:8px">Los feriados de 2027 siguen la lista fija del Decreto Legislativo 713 y deben confirmarse cuando se publique el calendario oficial.</div></details></div>';
+}
+
+/* ---------- render ---------- */
+function render(){
+  pc.clear();
+  const tabs=[['hoy','Hoy y mañana','hoy'],['cal','Calendario','cal'],['exp','Expedientes','exp'],['reglas','Reglas','reglas']];
+  const cur=ui.view==='det'?'exp':ui.view;
+  const body=ui.view==='hoy'?vHoy():ui.view==='cal'?vCal():ui.view==='exp'?vExp():ui.view==='det'?vDet():vReglas();
+  const key=ui.view+'|'+(ui.view==='det'?ui.detail:''),entering=key!==lastKey;lastKey=key;
+  document.getElementById('app').innerHTML=
+   '<header class="top"><div class="brand"><svg class="mark" viewBox="0 0 44 44" aria-hidden="true"><rect class="pg" x="2" y="2" width="40" height="40" rx="12"/><rect class="gl" x="11" y="13" width="22" height="19" rx="4"/><path class="gl" d="M11 19h22M17 10v5M27 10v5"/><path class="gl ck" d="M17.5 25.5l3.2 3.2 6-6.4"/></svg><div><div class="name">lex<span class="i">ı<i></i></span></div><div class="tag">Plazos civiles · versión de prueba</div></div></div>'+
+   '<div class="themes" role="group" aria-label="Tema de color">'+PALETAS.map(p=>'<button class="sw" data-action="palette" data-p="'+p[0]+'" aria-pressed="'+(tema===p[0])+'" aria-label="Tema '+p[1]+'" style="--s1:'+p[2]+';--s2:'+p[3]+'"><i></i><span class="lbl">'+p[1]+'</span></button>').join('')+'</div></header>'+
+   '<nav aria-label="Secciones"><div class="seg">'+tabs.map(t=>'<button data-action="view" data-v="'+t[0]+'"'+(cur===t[0]?' aria-current="page"':'')+'>'+ic(t[2])+t[1]+'</button>').join('')+'</div></nav>'+
+   '<div class="aviso notice">'+ic('info')+'<span><strong>Lexi solo muestra lo que tú cargaste.</strong> Si falta un expediente aquí, no aparecerá su plazo. Verifica siempre la fecha oficial en el sistema del Poder Judicial.</span></div>'+
+   '<main class="view'+(entering?' enter':'')+'">'+body+'</main>'+
+   '<div class="foot">'+(saveFailed?'No se pudo guardar en este navegador. Tus cambios se perderán al cerrar la página. ':'Tus datos se guardan solo en este navegador. ')+'No cargues nombres de clientes ni datos personales.</div>';
+  if(ui.view==='exp'&&ui.showForm)formPrev();
+}
+
+/* ---------- datos de ejemplo ---------- */
+function nextHabil(d){while(motivoInhabil(d))d=addDays(d,1);return d}
+function notifFor(target,n){for(let k=1;k<120;k++){const c=addDays(target,-k);if(calcPlazo(c,n).venc===target)return c}return addDays(target,-n-2)}
+function seed(){
+  const t=todayISO();
+  const mk=(numero,acto,proceso,offset)=>{const n=ACTOS[acto].proceso?ACTOS[acto].dias[proceso]:ACTOS[acto].dias;const target=nextHabil(addDays(t,offset));return {id:uid(),numero,materia:'Civil',acto,proceso:proceso||null,notif:notifFor(target,n),estado:'pendiente',ejemplo:true,_t:target}};
+  const a=mk('00093-2026-0-1801-JP-CI-03','contestacion','sumarisimo',1);
+  const b=mk('00412-2026-0-1801-JR-CI-07','apel_auto',null,0);
+  const c=mk('01877-2025-0-1801-JR-CI-12','apel_sentencia','conocimiento',6);
+  const d=mk('02210-2025-0-1801-JR-CI-21','contestacion','abreviado',12);
+  [a,b,c,d].forEach(e=>delete e._t);
+  S.exps=[a,b,c,d];
+  S.notas=[
+   {id:uid(),exp:a.id,fecha:t,texto:'Revisar anexos 1-A y 1-B antes de redactar.',hecho:false,ejemplo:true},
+   {id:uid(),exp:a.id,fecha:plazo(a).venc,texto:'Presentar el escrito temprano; confirmar cargo en mesa de partes.',hecho:false,ejemplo:true},
+   {id:uid(),exp:c.id,fecha:addDays(t,3),texto:'Pedir al abogado que revise los agravios.',hecho:false,ejemplo:true}
+  ];
+  S.ejemplos=true;save();
+}
+
+/* ---------- eventos ---------- */
+document.addEventListener('click',function(ev){
+  const el=ev.target.closest('[data-action]');if(!el)return;
+  const a=el.dataset.action,id=el.dataset.id;
+  if(a==='togglenote')return;
+  if(a==='view'){ui.view=el.dataset.v;ui.showForm=false}
+  else if(a==='palette'){tema=el.dataset.p;applyTema();try{localStorage.setItem(TKEY,tema)}catch(e){}toast('Tema '+PALETAS.find(p=>p[0]===tema)[1])}
+  else if(a==='open'){ui.detail=id;ui.view='det';ui.confirm=null;ui.sel.det=null;ui.cal.det=null;scrollTo(0,0)}
+  else if(a==='goexp'){ui.view='exp'}
+  else if(a==='toggleform'){ui.showForm=!ui.showForm}
+  else if(a==='selday'){ui.sel[el.dataset.key]=el.dataset.date;ui.cal[el.dataset.key]=el.dataset.date.slice(0,7)}
+  else if(a==='calnav'){const k=el.dataset.key,dl=+el.dataset.delta;if(dl===0){ui.cal[k]=todayISO().slice(0,7);ui.sel[k]=todayISO()}else ui.cal[k]=shiftMonth(ui.cal[k]||todayISO().slice(0,7),dl)}
+  else if(a==='togglepres'){const e=S.exps.find(x=>x.id===id);if(e){e.estado=e.estado==='presentado'?'pendiente':'presentado';save();toast(e.estado==='presentado'?'Marcado como presentado':'Vuelto a pendiente')}}
+  else if(a==='del'){if(ui.confirm===id){S.exps=S.exps.filter(x=>x.id!==id);S.notas=S.notas.filter(n=>n.exp!==id);ui.confirm=null;ui.view='exp';save();toast('Expediente eliminado')}else{ui.confirm=id}}
+  else if(a==='delnote'){S.notas=S.notas.filter(n=>n.id!==id);save();toast('Nota quitada')}
+  else if(a==='delx'){S.extras=S.extras.filter(x=>x.fecha!==el.dataset.fecha);save();toast('Día inhábil quitado')}
+  else if(a==='clearex'){S.exps=S.exps.filter(e=>!e.ejemplo);S.notas=S.notas.filter(n=>!n.ejemplo);S.ejemplos=false;save();toast('Ejemplos borrados')}
+  render();
+});
+document.addEventListener('change',function(ev){
+  const t=ev.target;
+  if(t.dataset&&t.dataset.action==='togglenote'){const n=S.notas.find(x=>x.id===t.dataset.id);if(n){n.hecho=t.checked;save();render()}return}
+  if(t.id==='f-acto'||t.id==='f-proc'||t.id==='f-notif')formPrev();
+});
+document.addEventListener('input',function(ev){if(ev.target.id==='f-notif')formPrev()});
+document.addEventListener('submit',function(ev){
+  const f=ev.target.closest('form[data-form]');if(!f)return;ev.preventDefault();
+  const k=f.dataset.form,g=id=>document.getElementById(id);
+  if(k==='nuevo'){
+    const acto=g('f-acto').value,a=ACTOS[acto];
+    const e={id:uid(),numero:g('f-num').value.trim(),materia:'Civil',acto,proceso:a.proceso?g('f-proc').value:null,estado:'pendiente'};
+    if(a.manual){if(!g('f-man').value)return;e.fechaManual=g('f-man').value;e.notif=e.fechaManual;e.descripcion=g('f-desc').value.trim()}
+    else{if(!g('f-notif').value)return;e.notif=g('f-notif').value}
+    S.exps.push(e);save();ui.showForm=false;ui.detail=e.id;ui.view='det';ui.sel.det=null;ui.cal.det=null;toast('Expediente guardado');
+  }else if(k==='addnote'){
+    const key=f.dataset.key,fid=f.dataset.fid||(g('nf-exp-'+key)||{}).value,txt=g('nf-text-'+key).value.trim();
+    if(!fid||!txt)return;
+    S.notas.push({id:uid(),exp:fid,fecha:ui.sel[key]||todayISO(),texto:txt,hecho:false});save();toast('Nota guardada');
+  }else if(k==='inhabil'){
+    const fe=g('x-fecha').value,mo=g('x-mot').value.trim();
+    if(!fe||!mo||S.extras.some(x=>x.fecha===fe))return;
+    S.extras.push({fecha:fe,motivo:mo});save();toast('Día inhábil agregado');
+  }
+  render();
+});
+
+loadTema();applyTema();
+if(!load())seed();
+render();
+})();
+</script>
+
+</body>
+</html>
