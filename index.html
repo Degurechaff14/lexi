@@ -755,7 +755,14 @@ function tErr(e){
   if(/Failed to fetch|NetworkError/i.test(m))return 'No hay conexión con el servidor. Revisa tu internet.';
   return 'No se pudo completar: '+m;
 }
+function clearOverlays(){
+  ui.tour=null;ui.cfg=null;ui.modal=null;ui.busy=false;
+  ['tour','modal'].forEach(id=>{const e=document.getElementById(id);if(e)e.remove()});
+  document.querySelectorAll('.hl').forEach(e=>e.classList.remove('hl'));
+  document.body.classList.remove('touring');
+}
 function renderAuth(){
+  clearOverlays();
   const msg=(A.err?'<div class="msg err" role="alert">'+esc(A.err)+'</div>':'')+(A.ok?'<div class="msg ok" role="status">'+esc(A.ok)+'</div>':'');
   const dis=A.busy?' disabled':'';
   const google='<button class="btn btn-google block" type="button" data-action="auth-google"'+(A.busy||A.gbusy?' disabled':'')+'>'+GOOGLE+(A.gbusy?'Abriendo Google…':'Continuar con Google')+'</button><div class="divider">o con tu correo</div>';
@@ -910,7 +917,7 @@ function avatar(id){
 }
 const O={step:0,username:'',nivel:'',guia:'',err:'',busy:false};
 function renderOnboard(){
-  document.body.classList.remove('touring');
+  clearOverlays();
   if(!O.username)O.username=(profile&&profile.username)||'';
   const bar='<div class="ob-bar" aria-hidden="true">'+[0,1,2].map(i=>'<i class="'+(i<=O.step?'on':'')+'"></i>').join('')+'</div><div class="ob-step">Paso '+(O.step+1)+' de 3</div>';
   const msg=O.err?'<div class="msg err" role="alert">'+esc(O.err)+'</div>':'';
