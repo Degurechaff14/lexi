@@ -328,7 +328,7 @@ body.touring{padding-bottom:300px}
 .modal .lead{text-align:left}
 .danger-box{background:var(--red-soft);color:var(--red);border-radius:12px;padding:12px 14px;font-size:.88rem}
 .btn.solid-danger{background:var(--red);border-color:var(--red);color:var(--surface)}
-@media (max-width:560px){.c-txt{display:none}.carnet{padding:6px}.carnet::before{left:22px}.pop{position:fixed;left:16px;right:16px;top:auto;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:auto;max-width:none}}
+@media (max-width:560px){.c-txt{display:none}.carnet{min-height:44px}.carnet{padding:6px}.carnet::before{left:22px}.pop{position:fixed;left:16px;right:16px;top:auto;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:auto;max-width:none}}
 @media (prefers-reduced-motion:no-preference){
   .pop,.modal{animation:popIn .22s cubic-bezier(.2,.7,.2,1) both}
   .modal-bg{animation:fadeIn .2s both}
@@ -379,12 +379,67 @@ button.stat:hover{border-color:var(--accent);transform:translateY(-2px);box-shad
 }
 @media (prefers-reduced-motion:reduce){.item:hover,.cell:hover{transform:none}#toast{transition:none}}
 @media (max-width:480px){.bar{grid-template-columns:72px minmax(0,1fr) 60px}.cell{min-height:50px;padding:3px}.cell .d{width:22px;height:22px;font-size:.76rem}}
+
+/* guías de diseño: ritmo en múltiplos de 4, sombras teñidas del acento, bordes de campos visibles (3:1), foco claro y deshacer */
+:root{--field:color-mix(in srgb,var(--muted) 62%,var(--surface));--shadow-tint:color-mix(in srgb,var(--accent) 16%,transparent)}
+.wrap{gap:20px;padding-top:24px}
+.view{gap:24px}
+.sect{gap:12px}
+h1{letter-spacing:-.02em}
+.card{border-radius:16px;box-shadow:0 1px 2px var(--shadow)}
+.item{gap:16px}
+.item:hover,button.stat:hover{box-shadow:0 12px 28px -10px var(--shadow-tint),0 2px 6px var(--shadow)}
+.leaf{border-radius:12px}
+.empty{border-radius:16px;display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:16px 20px}
+.empty .row{gap:8px}
+.stats{gap:12px}
+.btn{min-height:44px;justify-content:center}
+.btn.sm{min-height:36px}
+.btn:hover{box-shadow:0 6px 16px -6px var(--shadow-tint)}
+input,select,textarea{border-color:var(--field);min-height:44px}
+textarea{min-height:88px}
+input:hover,select:hover,textarea:hover{border-color:var(--muted)}
+input[aria-invalid="true"]{border-color:var(--red)}
+input[type="checkbox"]{width:22px;height:22px;min-height:0;margin:1px 0 0}
+.check label{padding-top:1px}
+.leaf .m{font-size:.7rem}
+.c-lbl,.pop-l{font-size:.7rem}
+.dow{font-size:.72rem}
+.date,.leaf .d,.cell .d,.mono{font-variant-numeric:tabular-nums}
+/* días de otros meses: sin opacidad para que el número siga siendo legible */
+.cell.out{opacity:1;background:transparent;border-color:transparent}
+.cell.out .d{color:var(--muted)}
+.cell.out.inh{background:transparent}
+:where(a,button,input,select,textarea,summary,[tabindex]):focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.skip{position:absolute;left:16px;top:-80px;z-index:100;background:var(--accent);color:var(--accent-ink);padding:12px 16px;border-radius:12px;font-weight:600;text-decoration:none}
+.skip:focus{top:12px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+main:focus{outline:none}
+.hint{font-size:.8rem}
+.msg.warn{background:var(--amber-soft);color:var(--amber)}
+.allclear{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;font:600 .8rem var(--font-body);color:var(--green);background:var(--green-soft);border-radius:999px;padding:4px 12px 4px 8px}
+.allclear .ic{width:16px;height:16px}
+#toast{padding:8px 8px 8px 18px;min-height:44px;width:max-content}
+#toast:not(:has(.t-act)){padding-right:18px}
+#toast.show{pointer-events:auto}
+.t-act{background:none;border:0;border-radius:999px;color:inherit;font:700 .88rem var(--font-body);padding:8px 14px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.t-act:hover{background:color-mix(in srgb,var(--bg) 16%,transparent)}
+.t-act:focus-visible{outline:2px solid var(--bg);outline-offset:-2px}
+kbd{font:500 .75rem var(--font-mono);background:var(--bg);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px;color:var(--ink)}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center;font-size:.82rem;color:var(--muted)}
+@media (hover:none){.pop-keys{display:none}}
+@media (prefers-reduced-motion:no-preference){
+  .flash .leaf{animation:leafPop .55s cubic-bezier(.2,.7,.2,1)}
+  .flash .badge{animation:rise .35s both}
+  @keyframes leafPop{0%{transform:scale(.88)}60%{transform:scale(1.06)}100%{transform:none}}
+}
+
 /* celular: cifras compactas, pestañas abajo y botones más grandes */
 @media (max-width:620px){
   .stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
   .stat{padding:10px 8px;gap:0;align-items:center;text-align:center}
   button.stat{text-align:center}
-  .stat .l{font-size:.6rem;letter-spacing:.04em}
+  .stat .l{font-size:.68rem;letter-spacing:.03em}
   .stat .n{font-size:1.5rem}
   .stat .s{display:none}
   nav{position:fixed;top:auto;bottom:0;left:0;right:0;z-index:20;padding:0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -6px 20px var(--shadow)}
@@ -480,12 +535,16 @@ async function pushCloud(){
   const {error}=await sb.from('user_data').upsert({user_id:user.id,data:S,updated_at:new Date().toISOString()});
   sync=error?'err':'ok';syncUI();
 }
-function syncUI(){const el=document.getElementById('sync');if(!el)return;el.className='sync'+(sync==='err'?' err':sync==='pending'?' pending':'');el.textContent=sync==='pending'?'Guardando…':sync==='err'?'Sin conexión · no guardado':'Guardado en tu cuenta'}
+function syncUI(){const el=document.getElementById('sync');if(!el)return;el.className='sync'+(sync==='err'?' err':sync==='pending'?' pending':'');el.textContent=sync==='pending'?'Guardando…':sync==='err'?'Sin conexión · se guardará al reconectar':'Guardado en tu cuenta'}
 const whereTxt=()=>user?'Los datos se guardan en tu cuenta de Lexi.':'Los datos se guardan únicamente en este navegador.';
 function load(){try{const r=localStorage.getItem(storeKey());if(r){const o=JSON.parse(r);if(o&&Array.isArray(o.exps))S=Object.assign(S,o);return true}}catch(e){}return false}
 function loadTema(){try{const t=localStorage.getItem(TKEY);if(PALETAS.some(p=>p[0]===t))tema=t}catch(e){}}
 function applyTema(){document.documentElement.setAttribute('data-palette',tema)}
-function toast(msg){const el=document.getElementById('toast');el.innerHTML=ic('check')+'<span>'+esc(msg)+'</span>';el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2200)}
+let undoFn=null;
+/* Un aviso con «Deshacer» dura más, para que dé tiempo de pulsarlo. */
+function toast(msg,undo){const el=document.getElementById('toast');undoFn=undo||null;el.innerHTML=ic('check')+'<span>'+esc(msg)+'</span>'+(undo?'<button type="button" class="t-act" data-action="undo">Deshacer</button>':'');el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>{el.classList.remove('show');undoFn=null},undo?6000:2600)}
+const snap=()=>{const s=JSON.stringify(S);return ()=>{S=JSON.parse(s)}};
+function doUndo(){if(!undoFn)return;const f=undoFn;undoFn=null;f();save();toast('Se deshizo el cambio');render()}
 
 const ICONS={
  hoy:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
@@ -534,6 +593,7 @@ function leaf(date,k){
 }
 function expHead(e){return '<div class="head"><span class="mono">'+esc(e.numero)+'</span><span class="row" style="gap:6px"><span class="chip">'+esc(e.materia)+'</span>'+(e.ejemplo?'<span class="chip ej">Ejemplo</span>':'')+'</span></div>'}
 
+function urgentCount(){const t=todayISO(),m=addDays(t,1);return S.exps.filter(e=>e.estado!=='presentado'&&plazo(e).venc<=m).length}
 function itemsOn(date,fid){
   const out=[];
   for(const e of S.exps){if(fid&&e.id!==fid)continue;const p=plazo(e);if(p.venc===date)out.push({t:'plazo',e,p})}
@@ -545,7 +605,7 @@ function itemCard(it){
   const e=it.e;
   if(it.t==='plazo'){
     const u=urg(e,it.p),done=e.estado==='presentado';
-    return '<article class="card item">'+leaf(it.p.venc,u.k)+'<div class="stack-sm">'+expHead(e)+
+    return '<article class="card item'+(ui.flash===e.id?' flash':'')+'">'+leaf(it.p.venc,u.k)+'<div class="stack-sm">'+expHead(e)+
       '<div class="row between"><span class="title'+(done?' done-text':'')+'">'+esc(actoTxt(e))+'</span><span class="badge '+u.k+'">'+u.txt+'</span></div>'+
       '<div class="small muted">Último día: '+fCorta(it.p.venc)+(it.p.dias?' · '+it.p.dias+' días hábiles desde la notificación del '+fCorta(e.notif):' · fecha puesta a mano')+'</div>'+
       '<div class="row" style="gap:8px;margin-top:4px">'+presBtn(e)+'<button class="btn ghost sm" data-action="open" data-id="'+e.id+'">'+ic('open')+'Abrir expediente</button></div></div></article>';
@@ -565,16 +625,19 @@ function vHoy(){
   const pend=x=>x.filter(i=>i.t==='plazo'&&i.e.estado!=='presentado').length;
   const notas=x=>x.filter(i=>i.t==='nota'&&!i.n.hecho).length;
   const urgentes=pend(hoy)+pend(man);
-  let h='<section class="hero"><span class="eyebrow">Tu día</span><h1>'+fLarga(t)+'</h1><p>'+
+  if(!S.exps.length)return '<section class="hero"><span class="eyebrow">Tu día</span><h1>'+fLarga(t)+'</h1><p>Todavía no cargaste expedientes. Registra el primero con su número y la fecha de notificación, y Lexi calculará su último día.</p></section>'+
+    '<div class="empty"><span>Puedes empezar con uno tuyo o mirar primero cómo se ve Lexi con ejemplos.</span><div class="row"><button class="btn" data-action="newexp">'+ic('plus')+'Cargar mi primer expediente</button><button class="btn ghost" data-action="seed">Ver ejemplos</button></div></div>';
+  const alDia=!urgentes&&!late.length;
+  let h='<section class="hero"><span class="eyebrow">Tu día</span><h1>'+fLarga(t)+'</h1>'+(alDia?'<span class="allclear">'+ic('check')+'Todo al día</span>':'')+'<p>'+
     (urgentes?'Tienes '+urgentes+(urgentes===1?' plazo por presentar':' plazos por presentar')+' entre hoy y mañana.':'Nada de lo que cargaste vence hoy ni mañana.')+
     (late.length?' Además hay '+late.length+(late.length===1?' plazo vencido':' plazos vencidos')+' sin marcar como presentado.':'')+'</p></section>';
   const st=(l,n,x,cls,id)=>{const k=notas(x);return '<button type="button" class="card stat'+(cls?' '+cls:'')+(n?'':' zero')+'" data-action="jump" data-t="'+id+'" aria-label="'+l+': '+n+' plazos'+(k?', '+k+' notas':'')+'"><span class="l">'+l+'</span><span class="n">'+n+'</span><span class="s">'+(k?'+ '+k+(k===1?' nota':' notas'):(n===1?'plazo':'plazos'))+'</span></button>'};
   h+='<div class="stats">'+st('Vencidos',late.length,[],late.length?'alert':'','sec-late')+st('Hoy',pend(hoy),hoy,pend(hoy)?'warm':'','sec-hoy')+st('Mañana',pend(man),man,pend(man)?'warm':'','sec-man')+st('7 días',pend(prox),prox,'','sec-prox')+'</div>';
   if(late.length)h+='<section class="sect" id="sec-late"><div class="sect-h"><h2>Vencidos sin presentar</h2><span class="count">'+late.length+'</span></div>'+late.map(itemCard).join('')+'</section>';
-  h+=sec('sec-hoy','Hoy','',hoy,'No cargaste plazos ni notas para hoy. Si tienes algo pendiente y no aparece, falta cargarlo.');
-  h+=sec('sec-man','Mañana',fLarga(m),man,'No cargaste plazos ni notas para mañana.');
-  h+=sec('sec-prox','Próximos 7 días','',prox,'Nada cargado para los siguientes días.');
-  if(S.ejemplos)h+='<div class="ejemplos slim"><span>Estás viendo expedientes de ejemplo para que pruebes Lexi.</span><button class="btn ghost sm" data-action="clearex">Borrar ejemplos</button></div>';
+  h+=sec('sec-hoy','Hoy','',hoy,'Nada vence hoy. Si esperabas algo y no aparece, revisa que esté cargado en Expedientes.');
+  h+=sec('sec-man','Mañana',fLarga(m),man,'Nada vence mañana.');
+  h+=sec('sec-prox','Próximos 7 días','',prox,'Nada vence en los próximos 7 días.');
+  if(S.ejemplos)h+='<div class="ejemplos slim"><span>Estás viendo expedientes de ejemplo. Bórralos cuando cargues los tuyos.</span><button class="btn ghost sm" data-action="clearex">Borrar ejemplos</button></div>';
   return h;
 }
 
@@ -590,7 +653,7 @@ function calendar(key,fid){
       if(it.t==='plazo'){const u=urg(it.e,it.p);dots+='<span class="dot '+(u.k==='late'?'red':u.k==='calm'?'':u.k)+'"></span>'}
       else dots+='<span class="dot note"></span>';
     }
-    cells+='<button class="cell'+(inM?'':' out')+(mi?' inh':'')+(d===t?' today':'')+(d===sel?' sel':'')+'" data-action="selday" data-key="'+key+'" data-date="'+d+'" title="'+esc(mi||'')+'" aria-label="'+esc(fLarga(d)+(mi?' ('+mi+')':'')+(its.length?', '+its.length+' elementos':''))+'"'+(d===sel?' aria-pressed="true"':'')+'><span class="d">'+parseInt(d.slice(8),10)+'</span><span class="dots">'+dots+'</span></button>';
+    cells+='<button class="cell'+(inM?'':' out')+(mi?' inh':'')+(d===t?' today':'')+(d===sel?' sel':'')+'" data-action="selday" data-key="'+key+'" data-date="'+d+'" title="'+esc(mi||'')+'" aria-label="'+esc(fLarga(d)+(mi?' ('+mi+')':'')+(its.length?', '+its.length+' elementos':''))+'"'+(d===sel?' aria-pressed="true"':'')+(d===t?' aria-current="date"':'')+'><span class="d">'+parseInt(d.slice(8),10)+'</span><span class="dots">'+dots+'</span></button>';
   }
   const dows=['lun','mar','mié','jue','vie','sáb','dom'].map(x=>'<div class="dow">'+x+'</div>').join('');
   const its=itemsOn(sel,fid),mi=motivoInhabil(sel);
@@ -606,7 +669,7 @@ function calendar(key,fid){
     '<div class="legend"><span><i class="dot red"></i>Vence hoy o mañana</span><span><i class="dot amber"></i>Próximo</span><span><i class="dot"></i>Plazo</span><span><i class="dot done"></i>Presentado</span><span><i class="dot note"></i>Nota</span></div>'+panel+'</div>';
 }
 function noteForm(key,fid){
-  if(!S.exps.length)return '<div class="small muted">Carga un expediente para poder añadir notas.</div>';
+  if(!S.exps.length)return '<div class="empty"><span>Las notas se asocian a un expediente. Carga uno para poder añadirlas.</span><button class="btn ghost sm" data-action="newexp">'+ic('plus')+'Nuevo expediente</button></div>';
   ui.noteOpen=ui.noteOpen||{};
   if(!ui.noteOpen[key])return '<div><button class="btn ghost" type="button" data-action="noteopen" data-key="'+key+'">'+ic('plus')+'Añadir nota a este día</button></div>';
   const sel=fid?'':'<label>Expediente<select id="nf-exp-'+key+'">'+S.exps.map(e=>'<option value="'+e.id+'">'+esc(e.numero)+'</option>').join('')+'</select></label>';
@@ -623,35 +686,39 @@ function vExp(){
   const counts=MATERIAS.map(m=>({m,n:S.exps.filter(e=>e.materia===m).length}));
   const max=Math.max(1,...counts.map(c=>c.n));
   const pend=S.exps.filter(e=>e.estado!=='presentado').length;
-  let h='<div class="stack"><div class="row between" style="align-items:flex-end"><div class="hero"><span class="eyebrow">'+S.exps.length+' cargados · '+pend+' pendientes</span><h1>Expedientes</h1></div><button class="btn" data-action="toggleform">'+(ui.showForm?'Cerrar':ic('plus')+'Nuevo expediente')+'</button></div>';
+  let h='<div class="stack"><div class="row between" style="align-items:flex-end"><div class="hero"><span class="eyebrow">'+S.exps.length+' cargados · '+pend+' pendientes</span><h1>Expedientes</h1></div><button class="btn" data-action="toggleform">'+(ui.showForm?'Cerrar formulario':ic('plus')+'Nuevo expediente')+'</button></div>';
   if(ui.showForm)h+=formNuevo();
   h+='<div class="materias"><span class="chip">Civil · '+counts[0].n+(counts[0].n===1?' expediente':' expedientes')+'</span><span class="small muted">Penal, Familia, Laboral y Notarial: próximamente</span></div>';
   const list=S.exps.slice().sort((a,b)=>plazo(a).venc<plazo(b).venc?-1:1);
-  if(list.length>2)h+='<label class="search"><span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Buscar expediente</span>'+ic('search')+'<input id="exp-q" type="search" placeholder="Buscar por número de expediente" autocomplete="off"></label><div class="empty" id="exp-none" hidden>Ningún expediente coincide con esa búsqueda.</div>';
+  if(list.length>2)h+='<label class="search"><span class="sr-only">Buscar expediente</span>'+ic('search')+'<input id="exp-q" type="search" placeholder="Buscar por número de expediente" autocomplete="off" aria-keyshortcuts="/"></label><div class="empty" id="exp-none" hidden>Ningún expediente coincide con esa búsqueda.</div>';
   h+=list.length?list.map(e=>{const p=plazo(e),u=urg(e,p);
     return '<article class="card item link exp-card" data-action="open" data-id="'+e.id+'" data-num="'+esc(String(e.numero).toLowerCase())+'" tabindex="0" role="button" aria-label="Abrir expediente '+esc(e.numero)+'">'+leaf(p.venc,u.k)+'<div class="stack-sm">'+expHead(e)+
     '<div class="row between"><span class="title">'+esc(actoTxt(e))+'</span><span class="badge '+u.k+'">'+u.txt+'</span></div>'+
-    '<div class="small muted">Último día: '+fCorta(p.venc)+'</div><span class="more">Ver detalle'+ic('next')+'</span></div></article>'}).join(''):'<div class="empty">Aún no tienes expedientes. Pulsa "Nuevo expediente".</div>';
+    '<div class="small muted">Último día: '+fCorta(p.venc)+'</div><span class="more">Ver detalle'+ic('next')+'</span></div></article>'}).join(''):'<div class="empty"><span>Aún no tienes expedientes. Registra uno con su número y Lexi calculará su último día.</span>'+(ui.showForm?'':'<button class="btn" data-action="newexp">'+ic('plus')+'Cargar mi primer expediente</button>')+'</div>';
   return h+'</div>';
 }
 function formNuevo(){
   return '<form class="card stack" data-form="nuevo" id="f-nuevo">'+
   '<h3>Nuevo expediente</h3>'+
   '<div class="aviso">'+ic('info')+'<span><strong>Usa solo el número de expediente.</strong> No escribas nombres de clientes ni datos personales. '+whereTxt()+'</span></div>'+
-  '<div class="grid2"><label>Número de expediente<input id="f-num" required maxlength="40" placeholder="00000-2026-0-1801-JR-CI-00" autocomplete="off"></label>'+
+  '<div class="grid2"><label>Número de expediente<input id="f-num" required maxlength="40" placeholder="00000-2026-0-1801-JR-CI-00" autocomplete="off" aria-describedby="f-num-h"><span class="hint" id="f-num-h">Tal como figura en la cédula de notificación.</span></label>'+
   '<label>Materia<select id="f-mat">'+MATERIAS.map(m=>'<option'+(m==='Civil'?'':' disabled')+'>'+m+(m==='Civil'?'':' (próximamente)')+'</option>').join('')+'</select></label></div>'+
   '<div class="grid2"><label>Acto que debes presentar<select id="f-acto">'+Object.keys(ACTOS).map(k=>'<option value="'+k+'">'+ACTOS[k].label+'</option>').join('')+'</select></label>'+
   '<label id="w-proc">Tipo de proceso<select id="f-proc">'+Object.keys(PROCESOS).map(k=>'<option value="'+k+'">'+PROCESOS[k]+'</option>').join('')+'</select></label></div>'+
-  '<div class="grid2"><label id="w-notif">Fecha de notificación<input type="date" id="f-notif" value="'+todayISO()+'"></label>'+
+  '<div class="grid2"><label id="w-notif">Fecha de notificación<input type="date" id="f-notif" value="'+todayISO()+'" aria-describedby="f-notif-h"><span class="hint" id="f-notif-h">Si fue electrónica, la fecha en que surte efectos.</span></label>'+
   '<label id="w-man" hidden>Fecha límite<input type="date" id="f-man"></label></div>'+
   '<label id="w-desc" hidden>Descripción corta del acto<input id="f-desc" maxlength="60" placeholder="Ej.: absolver traslado"></label>'+
-  '<div class="card" id="f-prev" aria-live="polite" style="background:var(--soft);border-color:transparent;box-shadow:none"></div>'+
+  '<div id="f-warn" class="stack-sm" aria-live="polite"></div><div class="card" id="f-prev" aria-live="polite" style="background:var(--soft);border-color:transparent;box-shadow:none"></div>'+
   '<div class="row"><button class="btn" type="submit">'+ic('check')+'Guardar expediente</button><button class="btn ghost" type="button" data-action="toggleform">Cancelar</button></div></form>';
 }
 function formPrev(){
   const g=id=>document.getElementById(id);if(!g('f-acto'))return;
   const acto=g('f-acto').value,a=ACTOS[acto];
   g('w-proc').hidden=!a.proceso;g('w-notif').hidden=!!a.manual;g('w-man').hidden=!a.manual;g('w-desc').hidden=!a.manual;
+  const num=g('f-num').value.trim().toLowerCase(),nt0=g('f-notif').value,ws=[];
+  if(num&&S.exps.some(x=>String(x.numero).toLowerCase()===num))ws.push('Ya tienes un expediente con este número. Guárdalo igual solo si es otro acto del mismo caso.');
+  if(!a.manual&&nt0&&nt0>todayISO())ws.push('La fecha de notificación es posterior a hoy. Revisa que sea la correcta.');
+  g('f-warn').innerHTML=ws.map(w=>'<div class="msg warn">'+esc(w)+'</div>').join('');
   const box=g('f-prev');
   if(a.manual){box.innerHTML='<span class="small">Lexi mostrará la fecha que escribas. No calcula este acto.</span>';return}
   const nt=g('f-notif').value;if(!nt){box.textContent='Elige la fecha de notificación.';return}
@@ -661,7 +728,7 @@ function formPrev(){
 
 function vDet(){
   const e=S.exps.find(x=>x.id===ui.detail);
-  if(!e)return '<div class="empty">Ese expediente ya no existe. <button class="btn ghost sm" data-action="goexp">Volver</button></div>';
+  if(!e)return '<div class="empty"><span>Este expediente ya no existe. Puede que lo hayas eliminado.</span><button class="btn ghost sm" data-action="goexp">'+ic('back')+'Volver a expedientes</button></div>';
   const p=plazo(e),u=urg(e,p),done=e.estado==='presentado';
   const notas=S.notas.filter(n=>n.exp===e.id).sort((a,b)=>a.fecha<b.fecha?-1:1);
   const sk=p.saltados.length?'<details><summary>Cómo se contó este plazo</summary><div class="small stack" style="margin-top:8px"><div>Notificado el '+esc(fCorta(e.notif))+'. El día 1 es el '+esc(fCorta(p.primero))+'. Días que no cuentan:</div><ul style="margin:0;padding-left:18px">'+p.saltados.map(s=>'<li>'+esc(fCorta(s.fecha))+' ('+esc(s.motivo)+')</li>').join('')+'</ul></div></details>':'';
@@ -672,9 +739,9 @@ function vDet(){
   (p.dias?'<div class="small muted">'+p.dias+' días hábiles desde la notificación del '+esc(fCorta(e.notif))+'.'+(p.fuera?' Este plazo pasa de 2027 y faltan feriados de ese año.':'')+'</div>':'')+sk+
   '<div class="aviso">'+ic('info')+'<span>Lexi es una ayuda. La fecha oficial se verifica siempre en el sistema del Poder Judicial.</span></div>'+
   '<div class="row" style="gap:8px">'+presBtn(e)+
-  '<button class="btn danger sm'+(ui.confirm===e.id?' armed':'')+'" data-action="del" data-id="'+e.id+'">'+(ui.confirm===e.id?'Confirmar: eliminar con sus notas':'Eliminar expediente')+'</button></div></div></div>'+
+  '<button class="btn danger sm" data-action="del" data-id="'+e.id+'">'+ic('trash')+'Eliminar expediente</button></div></div></div>'+
   '<h2>Calendario del expediente</h2>'+calendar('det',e.id)+
-  '<div class="card stack"><h3>Todas las notas</h3>'+(notas.length?notas.map(n=>'<div class="row between" style="align-items:flex-start;flex-wrap:nowrap"><div class="check"><input type="checkbox" id="na-'+n.id+'" data-action="togglenote" data-id="'+n.id+'"'+(n.hecho?' checked':'')+' aria-label="Marcar nota como hecha"><div><div class="mono">'+esc(fCorta(n.fecha))+'</div><div class="note-text'+(n.hecho?' done-text':'')+'">'+esc(n.texto)+'</div></div></div><button class="btn ghost sm" data-action="delnote" data-id="'+n.id+'" aria-label="Eliminar nota">Quitar</button></div>').join(''):'<div class="empty">Sin notas todavía. Elige un día del calendario para añadir una.</div>')+'</div></div>';
+  '<div class="card stack"><h3>Todas las notas</h3>'+(notas.length?notas.map(n=>'<div class="row between" style="align-items:flex-start;flex-wrap:nowrap"><div class="check"><input type="checkbox" id="na-'+n.id+'" data-action="togglenote" data-id="'+n.id+'"'+(n.hecho?' checked':'')+' aria-label="Marcar nota como hecha"><div><div class="mono">'+esc(fCorta(n.fecha))+'</div><div class="note-text'+(n.hecho?' done-text':'')+'">'+esc(n.texto)+'</div></div></div><button class="btn ghost sm" data-action="delnote" data-id="'+n.id+'" aria-label="Eliminar nota">'+ic('trash')+'<span class="sr-only">Eliminar nota</span></button></div>').join(''):'<div class="empty">Sin notas todavía. Toca un día del calendario de arriba para añadir una.</div>')+'</div></div>';
 }
 
 function vReglas(){
@@ -686,7 +753,7 @@ function vReglas(){
   '<div class="small muted">El conteo empieza el día siguiente a la notificación y solo cuenta días hábiles. Si la notificación es electrónica, ingresa la fecha en que surte efectos.</div>'+
   '<h2 style="margin-top:10px">Días inhábiles extra</h2><div class="small muted">Agrega aquí los días que el Poder Judicial declare inhábiles (decretos, paros, cierres). Un día no laborable del sector público no siempre aplica a los juzgados: confirma antes de agregarlo. Los plazos ya cargados se recalculan solos.</div>'+
   '<form class="card stack" data-form="inhabil"><div class="grid2"><label>Fecha<input type="date" id="x-fecha" required></label><label>Motivo<input id="x-mot" required maxlength="60" placeholder="Ej.: resolución administrativa del PJ"></label></div><div><button class="btn" type="submit">'+ic('plus')+'Agregar día inhábil</button></div></form>'+
-  (S.extras.length?'<div class="card stack">'+S.extras.slice().sort((a,b)=>a.fecha<b.fecha?-1:1).map(x=>'<div class="row between"><span><span class="mono">'+esc(fCorta(x.fecha))+'</span> · '+esc(x.motivo)+'</span><button class="btn ghost sm" data-action="delx" data-fecha="'+x.fecha+'">Quitar</button></div>').join('')+'</div>':'')+
+  (S.extras.length?'<div class="card stack">'+S.extras.slice().sort((a,b)=>a.fecha<b.fecha?-1:1).map(x=>'<div class="row between"><span><span class="mono">'+esc(fCorta(x.fecha))+'</span> · '+esc(x.motivo)+'</span><button class="btn ghost sm" data-action="delx" data-fecha="'+x.fecha+'" aria-label="Eliminar día inhábil del '+esc(fCorta(x.fecha))+'">'+ic('trash')+'<span class="sr-only">Eliminar</span></button></div>').join('')+'</div>':'')+
   '<details class="card"><summary>Feriados nacionales cargados (2026 y 2027)</summary><div class="scroll"><table style="margin-top:8px"><tbody>'+fer.map(d=>'<tr><td class="mono">'+esc(fCorta(d))+'</td><td>'+esc(FERIADOS[d])+'</td></tr>').join('')+'</tbody></table></div><div class="small muted" style="margin-top:8px">Los feriados de 2027 siguen la lista fija del Decreto Legislativo 713 y deben confirmarse cuando se publique el calendario oficial.</div></details></div>';
 }
 
@@ -700,12 +767,14 @@ function render(){
   const body=ui.view==='hoy'?vHoy():ui.view==='cal'?vCal():ui.view==='exp'?vExp():ui.view==='det'?vDet():vReglas();
   const key=ui.view+'|'+(ui.view==='det'?ui.detail:''),entering=key!==lastKey;lastKey=key;
   document.getElementById('app').innerHTML=
-   headerHTML()+
+   '<a class="skip" href="#main">Saltar al contenido</a>'+headerHTML()+
    '<nav aria-label="Secciones"><div class="seg">'+tabs.map(t=>'<button data-action="view" data-v="'+t[0]+'"'+(cur===t[0]?' aria-current="page"':'')+'>'+ic(t[2])+'<span class="tab-l">'+t[1]+'</span><span class="tab-s">'+(t[0]==='hoy'?'Hoy':t[1])+'</span></button>').join('')+'</div></nav>'+
    '<p class="notice-line">'+ic('info')+'<span>Lexi muestra solo lo que cargaste. Verifica siempre la fecha oficial en el sistema del Poder Judicial.</span></p>'+
-   '<main class="view'+(entering?' enter':'')+'">'+body+'</main>'+
+   '<main id="main" tabindex="-1" class="view'+(entering?' enter':'')+'">'+body+'</main>'+
    '<div class="foot">'+(saveFailed?'No se pudo guardar en este navegador. Tus cambios se perderán al cerrar la página. ':(user?'Tus datos se guardan en tu cuenta de Lexi. ':'Tus datos se guardan solo en este navegador. '))+'No cargues nombres de clientes ni datos personales. <a href="privacidad.html" style="color:inherit">Política de privacidad</a></div>';
   if(ui.view==='exp'&&ui.showForm)formPrev();
+  /* Cada sección empieza desde arriba, sin heredar el desplazamiento de la anterior */
+  if(entering)scrollTo(0,0);
   syncUI();
   renderTour();
   renderModal();
@@ -738,6 +807,9 @@ document.addEventListener('click',function(ev){
   if(!el)return;
   const a=el.dataset.action,id=el.dataset.id;
   if(a==='togglenote')return;
+  if(a==='undo'){doUndo();return}
+  if(a==='seed'){seed();toast('Cargamos 4 expedientes de ejemplo');render();return}
+  if(a==='newexp'){ui.view='exp';ui.showForm=true;render();const n=document.getElementById('f-num');if(n)n.focus();return}
   if(a.startsWith('auth')||a==='logout'){authAction(a,el);return}
   if(a.startsWith('ob-')){obAction(a,el);return}
   if(a.startsWith('tour-')){ui.cfg=null;tourAction(a);return}
@@ -749,18 +821,19 @@ document.addEventListener('click',function(ev){
   if(a==='cfg-msg'||a==='cfg-del'){ui.cfg=null;ui.modal=a==='cfg-msg'?'msg':'del';ui.mErr='';ui.mVals=null;render();return}
   if(a==='modal-close'){if(!ui.busy){ui.modal=null;renderModal()}return}
   if(a==='view'){ui.view=el.dataset.v;ui.showForm=false}
-  else if(a==='palette'){tema=el.dataset.p;applyTema();try{localStorage.setItem(TKEY,tema)}catch(e){}toast('Tema '+PALETAS.find(p=>p[0]===tema)[1])}
+  else if(a==='palette'){tema=el.dataset.p;applyTema();try{localStorage.setItem(TKEY,tema)}catch(e){}toast('Tema '+PALETAS.find(p=>p[0]===tema)[1]+' aplicado')}
   else if(a==='open'){ui.detail=id;ui.view='det';ui.confirm=null;ui.sel.det=null;ui.cal.det=null;scrollTo(0,0)}
   else if(a==='goexp'){ui.view='exp'}
   else if(a==='toggleform'){ui.showForm=!ui.showForm}
   else if(a==='selday'){ui.sel[el.dataset.key]=el.dataset.date;ui.cal[el.dataset.key]=el.dataset.date.slice(0,7)}
   else if(a==='calnav'){const k=el.dataset.key,dl=+el.dataset.delta;if(dl===0){ui.cal[k]=todayISO().slice(0,7);ui.sel[k]=todayISO()}else ui.cal[k]=shiftMonth(ui.cal[k]||todayISO().slice(0,7),dl)}
-  else if(a==='togglepres'){const e=S.exps.find(x=>x.id===id);if(e){e.estado=e.estado==='presentado'?'pendiente':'presentado';save();toast(e.estado==='presentado'?'Marcado como presentado':'Vuelto a pendiente')}}
-  else if(a==='del'){if(ui.confirm===id){S.exps=S.exps.filter(x=>x.id!==id);S.notas=S.notas.filter(n=>n.exp!==id);ui.confirm=null;ui.view='exp';save();toast('Expediente eliminado')}else{ui.confirm=id}}
-  else if(a==='delnote'){S.notas=S.notas.filter(n=>n.id!==id);save();toast('Nota quitada')}
-  else if(a==='delx'){S.extras=S.extras.filter(x=>x.fecha!==el.dataset.fecha);save();toast('Día inhábil quitado')}
-  else if(a==='clearex'){S.exps=S.exps.filter(e=>!e.ejemplo);S.notas=S.notas.filter(n=>!n.ejemplo);S.ejemplos=false;save();toast('Ejemplos borrados')}
+  else if(a==='togglepres'){const e=S.exps.find(x=>x.id===id);if(e){const u=snap();e.estado=e.estado==='presentado'?'pendiente':'presentado';ui.flash=e.id;save();pc.clear();toast(e.estado==='presentado'?(urgentCount()?'Marcado como presentado':'Presentado. Ya no tienes plazos urgentes'):'Plazo devuelto a pendiente',u)}}
+  else if(a==='del'){const u=snap();S.exps=S.exps.filter(x=>x.id!==id);S.notas=S.notas.filter(n=>n.exp!==id);ui.view='exp';save();toast('Expediente eliminado',u)}
+  else if(a==='delnote'){const u=snap();S.notas=S.notas.filter(n=>n.id!==id);save();toast('Nota eliminada',u)}
+  else if(a==='delx'){const u=snap();S.extras=S.extras.filter(x=>x.fecha!==el.dataset.fecha);save();toast('Día inhábil eliminado',u)}
+  else if(a==='clearex'){const u=snap();S.exps=S.exps.filter(e=>!e.ejemplo);S.notas=S.notas.filter(n=>!n.ejemplo);S.ejemplos=false;save();toast('Ejemplos borrados',u)}
   render();
+  ui.flash=null;
 });
 document.addEventListener('change',function(ev){
   const t=ev.target;
@@ -768,7 +841,7 @@ document.addEventListener('change',function(ev){
   if(t.id==='f-acto'||t.id==='f-proc'||t.id==='f-notif')formPrev();
 });
 document.addEventListener('input',function(ev){
-  if(ev.target.id==='f-notif')formPrev();
+  if(ev.target.id==='f-notif'||ev.target.id==='f-num')formPrev();
   if(ev.target.id==='exp-q'){const q=ev.target.value.trim().toLowerCase();let n=0;document.querySelectorAll('.exp-card').forEach(c=>{const ok=!q||c.dataset.num.includes(q);c.hidden=!ok;if(ok)n++});const e=document.getElementById('exp-none');if(e)e.hidden=n>0}
 });
 document.addEventListener('keydown',function(ev){if((ev.key==='Enter'||ev.key===' ')&&ev.target.classList&&ev.target.classList.contains('exp-card')){ev.preventDefault();ev.target.click()}});
@@ -790,7 +863,7 @@ document.addEventListener('submit',function(ev){
     S.notas.push({id:uid(),exp:fid,fecha:ui.sel[key]||todayISO(),texto:txt,hecho:false});save();if(ui.noteOpen)ui.noteOpen[key]=false;toast('Nota guardada');
   }else if(k==='inhabil'){
     const fe=g('x-fecha').value,mo=g('x-mot').value.trim();
-    if(!fe||!mo||S.extras.some(x=>x.fecha===fe))return;
+    if(!fe||!mo)return;if(S.extras.some(x=>x.fecha===fe)){toast('Ese día ya está en la lista de inhábiles');return}
     S.extras.push({fecha:fe,motivo:mo});save();toast('Día inhábil agregado');
   }
   render();
@@ -813,8 +886,8 @@ function tErr(e){
   if(/Database error saving new user|duplicate key|unique/i.test(m))return 'Ese nombre de usuario ya está en uso. Elige otro.';
   if(/Could not find the (function|table)|schema cache|does not exist/i.test(m))return 'Esta función todavía no está activada en el servidor. Avisa a la administración de Lexi.';
   if(/check constraint/i.test(m))return 'Ese nombre de usuario no es válido. Usa de 3 a 30 caracteres.';
-  if(/Failed to fetch|NetworkError/i.test(m))return 'No hay conexión con el servidor. Revisa tu internet.';
-  return 'No se pudo completar: '+m;
+  if(/Failed to fetch|NetworkError/i.test(m))return 'No hay conexión con el servidor. Revisa tu internet y vuelve a intentarlo.';
+  return 'No se pudo completar la acción. Intenta de nuevo en un momento; si se repite, escríbenos desde Configuración. (Detalle: '+m+')';
 }
 function clearOverlays(){
   ui.tour=null;ui.cfg=null;ui.modal=null;ui.busy=false;
@@ -867,7 +940,8 @@ function cfgPanel(){
       (ui.cfgErr?'<div class="msg err" role="alert">'+esc(ui.cfgErr)+'</div>':'')+
       '<div class="row" style="gap:6px"><button class="btn sm" type="submit"'+(ui.busy?' disabled':'')+'>'+(ui.busy?'Guardando…':'Guardar')+'</button><button class="btn ghost sm" type="button" data-action="cfg-menu">Cancelar</button></div></form>';
   }else{
-    h+='<div class="pop-list">'+it('cfg-name','user','Cambiar nombre de usuario')+it('tour-start','play','Ver la guía otra vez')+it('cfg-msg','mail','Enviar un mensaje')+(INAPP?'':'<a class="pop-i" href="'+APK+'" style="text-decoration:none">'+ic('phone')+'Descargar app para Android</a>')+it('logout','out','Cerrar sesión')+it('cfg-del','trash','Eliminar cuenta','danger')+'</div>';
+    h+='<div class="pop-list">'+it('cfg-name','user','Cambiar nombre de usuario')+it('tour-start','play','Ver la guía otra vez')+it('cfg-msg','mail','Enviar un mensaje')+(INAPP?'':'<a class="pop-i" href="'+APK+'" style="text-decoration:none">'+ic('phone')+'Descargar app para Android</a>')+it('logout','out','Cerrar sesión')+it('cfg-del','trash','Eliminar cuenta','danger')+'</div>'+
+      '<div class="pop-s pop-keys" style="border-bottom:0;border-top:1px solid var(--line)"><div class="pop-l">Atajos de teclado</div><div class="keys"><span><kbd>1</kbd>–<kbd>4</kbd></span><span>Cambiar de sección</span><span><kbd>N</kbd></span><span>Nuevo expediente</span><span><kbd>/</kbd></span><span>Buscar expediente</span><span><kbd>Ctrl</kbd>+<kbd>Z</kbd></span><span>Deshacer el último cambio</span></div></div>';
   }
   return h+'</div>';
 }
@@ -1076,7 +1150,20 @@ function tourAction(a){
   if(ui.tour){const v=tourSteps()[ui.tour.i].v;if(ui.view!==v){ui.view=v;ui.showForm=false;scrollTo(0,0)}}
   render();
 }
-addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(ui.modal&&!ui.busy){ui.modal=null;renderModal()}else if(ui.cfg){ui.cfg=null;render();const gb=document.querySelector('.gear');if(gb)gb.focus()}else if(ui.tour){ui.tour=null;render()}});
+addEventListener('keydown',e=>{
+  /* Mantiene el foco dentro de la ventana abierta */
+  if(e.key==='Tab'&&ui.modal){const m=document.querySelector('#modal .modal');if(m){const f=[...m.querySelectorAll('button:not([disabled]),input,textarea,select,a[href]')];if(f.length){const a=f[0],z=f[f.length-1];if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}}}}
+  const typing=/^(INPUT|TEXTAREA|SELECT)$/.test((e.target&&e.target.tagName)||'')||(e.target&&e.target.isContentEditable);
+  if(!typing&&!ui.modal&&document.querySelector('nav')&&!e.altKey){
+    if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&e.key.toLowerCase()==='z'&&undoFn){e.preventDefault();doUndo();return}
+    if(!e.ctrlKey&&!e.metaKey){
+      const tabs=['hoy','cal','exp','reglas'];
+      if(/^[1-4]$/.test(e.key)){ui.view=tabs[+e.key-1];ui.showForm=false;ui.cfg=null;render();return}
+      if(e.key==='n'||e.key==='N'){e.preventDefault();ui.view='exp';ui.showForm=true;ui.cfg=null;render();const n=document.getElementById('f-num');if(n)n.focus();return}
+      if(e.key==='/'){e.preventDefault();if(ui.view!=='exp'){ui.view='exp';ui.showForm=false;render()}const q=document.getElementById('exp-q');if(q)q.focus();else toast('La búsqueda aparece cuando tienes más de 2 expedientes');return}
+    }
+  }
+  if(e.key!=='Escape')return;if(ui.modal&&!ui.busy){ui.modal=null;renderModal()}else if(ui.cfg){ui.cfg=null;render();const gb=document.querySelector('.gear');if(gb)gb.focus()}else if(ui.tour){ui.tour=null;render()}});
 function MARK(){return '<svg class="mark" viewBox="0 0 44 44" aria-hidden="true"><rect class="pg" x="2" y="2" width="40" height="40" rx="12"/><rect class="gl" x="11" y="13" width="22" height="19" rx="4"/><path class="gl" d="M11 19h22M17 10v5M27 10v5"/><path class="gl ck" d="M17.5 25.5l3.2 3.2 6-6.4"/></svg>'}
 function setA(o){Object.assign(A,o);renderAuth()}
 async function authAction(a,el){
