@@ -1,0 +1,11 @@
+{
+  "appId": "pe.lexi.plazos",
+  "appName": "Lexi",
+  "webDir": "www",
+  "appendUserAgent": "LexiApp",
+  "backgroundColor": "#F2F4F8",
+  "server": {
+    "url": "https://degurechaff14.github.io/lexi/",
+    "cleartext": false
+  }
+}

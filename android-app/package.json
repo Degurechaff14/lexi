@@ -1,0 +1,12 @@
+{
+  "name": "lexi-android",
+  "private": true,
+  "version": "1.0.0",
+  "description": "App de Android de Lexi: abre la web de Lexi dentro de una app.",
+  "devDependencies": {
+    "@capacitor/android": "6.2.0",
+    "@capacitor/assets": "3.0.5",
+    "@capacitor/cli": "6.2.0",
+    "@capacitor/core": "6.2.0"
+  }
+}

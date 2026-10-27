@@ -1,0 +1,62 @@
+name: App Android (APK)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'android-app/**'
+      - '.github/workflows/android.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Preparar el proyecto de Android
+        working-directory: android-app
+        run: |
+          npm install
+          npx cap add android
+          npx capacitor-assets generate --android --iconBackgroundColor '#1E3A8A' --iconBackgroundColorDark '#1E3A8A' --splashBackgroundColor '#F2F4F8' --splashBackgroundColorDark '#0B1120'
+          npx cap sync android
+
+      - name: Compilar el APK
+        working-directory: android-app/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Renombrar el APK
+        run: cp android-app/android/app/build/outputs/apk/debug/app-debug.apk Lexi.apk
+
+      - name: Guardar el APK en la ejecución
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lexi-apk
+          path: Lexi.apk
+
+      - name: Publicar el APK en Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: app-v${{ github.run_number }}
+          name: Lexi para Android (versión ${{ github.run_number }})
+          make_latest: true
+          files: Lexi.apk
+          body: |
+            APK de prueba de Lexi para Android.
+            Descárgalo en el celular, ábrelo y permite "instalar apps de origen desconocido" si te lo pide.
+            La app abre la web de Lexi, con las mismas cuentas y datos.

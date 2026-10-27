@@ -502,6 +502,7 @@ const ICONS={
  mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
  out:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
  trash:'<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/>',
+ phone:'<rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/>',
  search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
  play:'<circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z"/>',back:'<path d="M19 12H5M11 6l-6 6 6 6"/>',undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>'
 };
@@ -799,6 +800,8 @@ document.addEventListener('submit',function(ev){
 const A={mode:'login',email:'',user:'',pw:'',pw2:'',kind:'signup',err:'',ok:'',busy:false};
 const GOOGLE='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.6 12.3c0-.8-.1-1.5-.2-2.2H12v4.2h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-1.9 3.3-4.8 3.3-8z"/><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.7c-1 .7-2.2 1-3.7 1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.8A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.8 14.1a6.6 6.6 0 0 1 0-4.2V7.1H2.1a11 11 0 0 0 0 9.8z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.2-3.2A11 11 0 0 0 2.1 7.1l3.7 2.8C6.7 7.3 9.1 5.4 12 5.4z"/></svg>';
 const SITE=location.origin+location.pathname;
+const INAPP=/LexiApp/.test(navigator.userAgent);
+const APK='https://github.com/Degurechaff14/lexi/releases/latest/download/Lexi.apk';
 function tErr(e){
   const m=(e&&e.message)||String(e||'');
   if(/Invalid login credentials/i.test(m))return 'Correo o contraseña incorrectos.';
@@ -823,11 +826,11 @@ function renderAuth(){
   clearOverlays();
   const msg=(A.err?'<div class="msg err" role="alert">'+esc(A.err)+'</div>':'')+(A.ok?'<div class="msg ok" role="status">'+esc(A.ok)+'</div>':'');
   const dis=A.busy?' disabled':'';
-  const google='<button class="btn btn-google block" type="button" data-action="auth-google"'+(A.busy||A.gbusy?' disabled':'')+'>'+GOOGLE+(A.gbusy?'Abriendo Google…':'Continuar con Google')+'</button><div class="divider">o con tu correo</div>';
+  const google=INAPP?'':'<button class="btn btn-google block" type="button" data-action="auth-google"'+(A.busy||A.gbusy?' disabled':'')+'>'+GOOGLE+(A.gbusy?'Abriendo Google…':'Continuar con Google')+'</button><div class="divider">o con tu correo</div>';
   const tabs='<div class="seg" role="tablist"><button type="button" data-action="auth-mode" data-m="login"'+(A.mode==='login'?' aria-current="page"':'')+'>Iniciar sesión</button><button type="button" data-action="auth-mode" data-m="signup"'+(A.mode==='signup'?' aria-current="page"':'')+'>Crear cuenta</button></div>';
   let h='';
   if(A.mode==='login'){
-    h=tabs+google+'<form class="stack" data-form="auth-login"><label>Correo<input type="email" id="a-email" required autocomplete="email" value="'+esc(A.email)+'"></label><label>Contraseña<input type="password" id="a-pass" required autocomplete="current-password" value="'+esc(A.pw)+'"></label>'+msg+'<button class="btn block" type="submit"'+dis+'>'+(A.busy?'Ingresando…':'Iniciar sesión')+'</button></form><div class="row between"><button class="linkbtn" type="button" data-action="auth-mode" data-m="forgot">¿Olvidaste tu contraseña?</button></div>';
+    h=tabs+google+(INAPP?'<p class="small muted" style="margin:0;text-align:center">¿Entraste antes con Google? Crea una contraseña con «¿Olvidaste tu contraseña?» usando tu mismo correo.</p>':'')+'<form class="stack" data-form="auth-login"><label>Correo<input type="email" id="a-email" required autocomplete="email" value="'+esc(A.email)+'"></label><label>Contraseña<input type="password" id="a-pass" required autocomplete="current-password" value="'+esc(A.pw)+'"></label>'+msg+'<button class="btn block" type="submit"'+dis+'>'+(A.busy?'Ingresando…':'Iniciar sesión')+'</button></form><div class="row between"><button class="linkbtn" type="button" data-action="auth-mode" data-m="forgot">¿Olvidaste tu contraseña?</button></div>';
   }else if(A.mode==='signup'){
     h=tabs+google+'<form class="stack" data-form="auth-signup"><label>Nombre de usuario<input id="a-user" required minlength="3" maxlength="30" autocomplete="nickname" placeholder="Ej.: Arles Red" value="'+esc(A.user)+'"><span class="hint">De 3 a 30 caracteres. Puedes usar mayúsculas, espacios y tildes.</span></label><label>Correo<input type="email" id="a-email" required autocomplete="email" value="'+esc(A.email)+'"></label><label>Contraseña<input type="password" id="a-pass" required minlength="8" autocomplete="new-password" value="'+esc(A.pw)+'"><span class="hint">Mínimo 8 caracteres.</span></label><label>Repite la contraseña<input type="password" id="a-pass2" required minlength="8" autocomplete="new-password" value="'+esc(A.pw2)+'"></label>'+msg+'<button class="btn block" type="submit"'+dis+'>'+(A.busy?'Creando cuenta…':'Crear cuenta')+'</button></form>';
   }else if(A.mode==='code'){
@@ -840,7 +843,7 @@ function renderAuth(){
     h='<p class="lead">Cargando tus expedientes…</p>';
   }
   const titles={login:'Inicia sesión',signup:'Crea tu cuenta',code:'Confirma tu correo',forgot:'Recupera tu acceso',reset:'Nueva contraseña',loading:'Un momento'};
-  document.getElementById('app').innerHTML='<div class="auth"><div class="card auth-card"><div class="brand">'+MARK()+'<div><div class="name">lex<span class="i">ı<i></i></span></div><div class="tag">Plazos civiles</div></div></div><h1>'+titles[A.mode]+'</h1>'+h+'<p class="small muted" style="text-align:center;margin:0">Tus expedientes se guardan en tu cuenta. No cargues nombres de clientes ni datos personales. <a href="privacidad.html">Política de privacidad</a></p></div></div>';
+  document.getElementById('app').innerHTML='<div class="auth"><div class="card auth-card"><div class="brand">'+MARK()+'<div><div class="name">lex<span class="i">ı<i></i></span></div><div class="tag">Plazos civiles</div></div></div><h1>'+titles[A.mode]+'</h1>'+h+'<p class="small muted" style="text-align:center;margin:0">Tus expedientes se guardan en tu cuenta. No cargues nombres de clientes ni datos personales. <a href="privacidad.html">Política de privacidad</a></p>'+(INAPP?'':'<a class="btn ghost block" href="'+APK+'" style="text-decoration:none">'+ic('phone')+'Descargar app para Android</a>')+'</div></div>';
   const first=document.querySelector('.auth-card input:not([value]),.auth-card input[value=""]')||document.querySelector('.auth-card input');if(first&&!A.busy&&!A.err)first.focus();
 }
 /* ---------- encabezado, configuración y ventanas ---------- */
@@ -864,7 +867,7 @@ function cfgPanel(){
       (ui.cfgErr?'<div class="msg err" role="alert">'+esc(ui.cfgErr)+'</div>':'')+
       '<div class="row" style="gap:6px"><button class="btn sm" type="submit"'+(ui.busy?' disabled':'')+'>'+(ui.busy?'Guardando…':'Guardar')+'</button><button class="btn ghost sm" type="button" data-action="cfg-menu">Cancelar</button></div></form>';
   }else{
-    h+='<div class="pop-list">'+it('cfg-name','user','Cambiar nombre de usuario')+it('tour-start','play','Ver la guía otra vez')+it('cfg-msg','mail','Enviar un mensaje')+it('logout','out','Cerrar sesión')+it('cfg-del','trash','Eliminar cuenta','danger')+'</div>';
+    h+='<div class="pop-list">'+it('cfg-name','user','Cambiar nombre de usuario')+it('tour-start','play','Ver la guía otra vez')+it('cfg-msg','mail','Enviar un mensaje')+(INAPP?'':'<a class="pop-i" href="'+APK+'" style="text-decoration:none">'+ic('phone')+'Descargar app para Android</a>')+it('logout','out','Cerrar sesión')+it('cfg-del','trash','Eliminar cuenta','danger')+'</div>';
   }
   return h+'</div>';
 }
