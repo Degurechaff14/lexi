@@ -493,10 +493,10 @@ const FERIADOS={
 };
 const LAST_COVERED='2027-12-31';
 const ACTOS={
- contestacion:{label:'Contestar demanda',proceso:true,dias:{conocimiento:30,abreviado:10,sumarisimo:5}},
- apel_sentencia:{label:'Apelar sentencia',proceso:true,dias:{conocimiento:10,abreviado:10,sumarisimo:5}},
- apel_auto:{label:'Apelar auto',proceso:false,dias:3},
- casacion:{label:'Recurso de casación',proceso:false,dias:10},
+ contestacion:{label:'Contestar demanda',proceso:true,dias:{conocimiento:30,abreviado:10,sumarisimo:5},art:{conocimiento:'478',abreviado:'491',sumarisimo:'554'}},
+ apel_sentencia:{label:'Apelar sentencia',proceso:true,dias:{conocimiento:10,abreviado:5,sumarisimo:3},art:{conocimiento:'478 y 373',abreviado:'491 y 373',sumarisimo:'556'}},
+ apel_auto:{label:'Apelar auto',proceso:false,dias:3,art:'376 y 377'},
+ casacion:{label:'Recurso de casación',proceso:false,dias:10,art:'387'},
  otro:{label:'Otro acto (fecha manual)',manual:true}
 };
 const PROCESOS={conocimiento:'Conocimiento',abreviado:'Abreviado',sumarisimo:'Sumarísimo'};
@@ -515,6 +515,20 @@ function calcPlazo(notif,n){
   return {venc:d,dias:n,saltados:sk,primero:first,fuera:d>LAST_COVERED};
 }
 //#core-end
+/* Casilla electrónica: la notificación surte efectos el segundo día hábil siguiente a su ingreso (art. 155-C LOPJ)
+   y el plazo corre desde el día siguiente (art. 147 CPC). El término de la distancia se suma a los días del plazo. */
+function efectoCasilla(d){let c=0;while(c<2){d=addDays(d,1);if(!motivoInhabil(d))c++}return d}
+function plazoDe(e,n){
+  const ef=e.notifTipo==='casilla'?efectoCasilla(e.notif):e.notif,dist=Math.max(0,parseInt(e.distancia,10)||0);
+  const p=calcPlazo(ef,n+dist);p.dias=n;p.dist=dist;p.efecto=ef;p.casilla=e.notifTipo==='casilla';return p;
+}
+function artDe(e){const a=ACTOS[e.acto];return a.art?(typeof a.art==='string'?a.art:a.art[e.proceso]):''}
+/* Explica en una frase cómo se contó el plazo */
+function comoTxt(e,p){
+  const art=artDe(e);
+  return (p.dias+' días hábiles'+(art?' (art. '+art+' CPC)':'')+(p.dist?' + '+p.dist+(p.dist===1?' día':' días')+' de término de la distancia':'')+
+    (p.casilla?'. Ingresó a tu casilla el '+fCorta(e.notif)+' y surtió efectos el '+fCorta(p.efecto)+' (art. 155-C LOPJ)':', desde la notificación del '+fCorta(e.notif))+'.').replace(/\.\.+/g,'.');
+}
 
 const KEY='lexi.v1',TKEY='lexi.tema';
 const MATERIAS=['Civil','Penal','Familia','Laboral','Notarial'];
@@ -571,7 +585,7 @@ function plazo(e){
   if(pc.has(e.id))return pc.get(e.id);
   let p;
   if(ACTOS[e.acto].manual)p={venc:e.fechaManual,dias:null,saltados:[],manual:true};
-  else p=calcPlazo(e.notif,diasDe(e));
+  else p=plazoDe(e,diasDe(e));
   pc.set(e.id,p);return p;
 }
 const fLarga=s=>parse(s).toLocaleDateString('es-PE',{weekday:'long',day:'numeric',month:'long'});
@@ -607,7 +621,7 @@ function itemCard(it){
     const u=urg(e,it.p),done=e.estado==='presentado';
     return '<article class="card item'+(ui.flash===e.id?' flash':'')+'">'+leaf(it.p.venc,u.k)+'<div class="stack-sm">'+expHead(e)+
       '<div class="row between"><span class="title'+(done?' done-text':'')+'">'+esc(actoTxt(e))+'</span><span class="badge '+u.k+'">'+u.txt+'</span></div>'+
-      '<div class="small muted">Último día: '+fCorta(it.p.venc)+(it.p.dias?' · '+it.p.dias+' días hábiles desde la notificación del '+fCorta(e.notif):' · fecha puesta a mano')+'</div>'+
+      '<div class="small muted">Último día: '+fCorta(it.p.venc)+(it.p.dias?' · '+comoTxt(e,it.p):' · fecha puesta a mano')+'</div>'+
       '<div class="row" style="gap:8px;margin-top:4px">'+presBtn(e)+'<button class="btn ghost sm" data-action="open" data-id="'+e.id+'">'+ic('open')+'Abrir expediente</button></div></div></article>';
   }
   const n=it.n;
@@ -705,8 +719,10 @@ function formNuevo(){
   '<label>Materia<select id="f-mat">'+MATERIAS.map(m=>'<option'+(m==='Civil'?'':' disabled')+'>'+m+(m==='Civil'?'':' (próximamente)')+'</option>').join('')+'</select></label></div>'+
   '<div class="grid2"><label>Acto que debes presentar<select id="f-acto">'+Object.keys(ACTOS).map(k=>'<option value="'+k+'">'+ACTOS[k].label+'</option>').join('')+'</select></label>'+
   '<label id="w-proc">Tipo de proceso<select id="f-proc">'+Object.keys(PROCESOS).map(k=>'<option value="'+k+'">'+PROCESOS[k]+'</option>').join('')+'</select></label></div>'+
-  '<div class="grid2"><label id="w-notif">Fecha de notificación<input type="date" id="f-notif" value="'+todayISO()+'" aria-describedby="f-notif-h"><span class="hint" id="f-notif-h">Si fue electrónica, la fecha en que surte efectos.</span></label>'+
-  '<label id="w-man" hidden>Fecha límite<input type="date" id="f-man"></label></div>'+
+  '<div class="grid2" id="w-notifs"><label>Cómo te notificaron<select id="f-ntipo"><option value="casilla">Casilla electrónica (SINOE)</option><option value="fisica">Cédula en físico</option></select></label>'+
+  '<label>Fecha de notificación<input type="date" id="f-notif" value="'+todayISO()+'" aria-describedby="f-notif-h"><span class="hint" id="f-notif-h"></span></label></div>'+
+  '<label id="w-dist">Término de la distancia (días)<input type="number" id="f-dist" min="0" max="30" step="1" value="0" inputmode="numeric" aria-describedby="f-dist-h"><span class="hint" id="f-dist-h">Solo si corresponde según el Cuadro General de Términos de la Distancia del Poder Judicial. Si no, déjalo en 0.</span></label>'+
+  '<label id="w-man" hidden>Fecha límite<input type="date" id="f-man"></label>'+
   '<label id="w-desc" hidden>Descripción corta del acto<input id="f-desc" maxlength="60" placeholder="Ej.: absolver traslado"></label>'+
   '<div id="f-warn" class="stack-sm" aria-live="polite"></div><div class="card" id="f-prev" aria-live="polite" style="background:var(--soft);border-color:transparent;box-shadow:none"></div>'+
   '<div class="row"><button class="btn" type="submit">'+ic('check')+'Guardar expediente</button><button class="btn ghost" type="button" data-action="toggleform">Cancelar</button></div></form>';
@@ -714,7 +730,8 @@ function formNuevo(){
 function formPrev(){
   const g=id=>document.getElementById(id);if(!g('f-acto'))return;
   const acto=g('f-acto').value,a=ACTOS[acto];
-  g('w-proc').hidden=!a.proceso;g('w-notif').hidden=!!a.manual;g('w-man').hidden=!a.manual;g('w-desc').hidden=!a.manual;
+  g('w-proc').hidden=!a.proceso;g('w-notifs').hidden=!!a.manual;g('w-dist').hidden=!!a.manual;
+  const cas=g('f-ntipo').value==='casilla';g('f-notif-h').textContent=cas?'El día en que la notificación ingresó a tu casilla. Lexi suma los 2 días hábiles del art. 155-C de la LOPJ.':'El día en que recibiste la cédula.';g('w-man').hidden=!a.manual;g('w-desc').hidden=!a.manual;
   const num=g('f-num').value.trim().toLowerCase(),nt0=g('f-notif').value,ws=[];
   if(num&&S.exps.some(x=>String(x.numero).toLowerCase()===num))ws.push('Ya tienes un expediente con este número. Guárdalo igual solo si es otro acto del mismo caso.');
   if(!a.manual&&nt0&&nt0>todayISO())ws.push('La fecha de notificación es posterior a hoy. Revisa que sea la correcta.');
@@ -722,8 +739,8 @@ function formPrev(){
   const box=g('f-prev');
   if(a.manual){box.innerHTML='<span class="small">Lexi mostrará la fecha que escribas. No calcula este acto.</span>';return}
   const nt=g('f-notif').value;if(!nt){box.textContent='Elige la fecha de notificación.';return}
-  const n=a.proceso?a.dias[g('f-proc').value]:a.dias,p=calcPlazo(nt,n);
-  box.innerHTML='<div class="item" style="box-shadow:none">'+leaf(p.venc,'calm')+'<div class="stack-sm"><div class="title" style="text-transform:none">Último día: '+esc(fLarga(p.venc))+'</div><div class="small muted">'+n+' días hábiles contados desde el día siguiente a la notificación. Se saltan '+p.saltados.length+' días inhábiles.'+(p.fuera?' Atención: este plazo pasa de 2027 y Lexi aún no tiene los feriados de ese año.':'')+' Confirma siempre la fecha en el sistema del Poder Judicial.</div></div></div>';
+  const n=a.proceso?a.dias[g('f-proc').value]:a.dias,fe={acto,proceso:a.proceso?g('f-proc').value:null,notif:nt,notifTipo:g('f-ntipo').value,distancia:g('f-dist').value},p=plazoDe(fe,n);
+  box.innerHTML='<div class="item" style="box-shadow:none">'+leaf(p.venc,'calm')+'<div class="stack-sm"><div class="title" style="text-transform:none">Último día: '+esc(fLarga(p.venc))+'</div><div class="small muted">'+esc(comoTxt(fe,p))+' Se saltan '+p.saltados.length+(p.saltados.length===1?' día inhábil.':' días inhábiles.')+(p.fuera?' Atención: este plazo pasa de 2027 y Lexi aún no tiene los feriados de ese año.':'')+' Confirma siempre la fecha en el sistema del Poder Judicial.</div></div></div>';
 }
 
 function vDet(){
@@ -731,12 +748,12 @@ function vDet(){
   if(!e)return '<div class="empty"><span>Este expediente ya no existe. Puede que lo hayas eliminado.</span><button class="btn ghost sm" data-action="goexp">'+ic('back')+'Volver a expedientes</button></div>';
   const p=plazo(e),u=urg(e,p),done=e.estado==='presentado';
   const notas=S.notas.filter(n=>n.exp===e.id).sort((a,b)=>a.fecha<b.fecha?-1:1);
-  const sk=p.saltados.length?'<details><summary>Cómo se contó este plazo</summary><div class="small stack" style="margin-top:8px"><div>Notificado el '+esc(fCorta(e.notif))+'. El día 1 es el '+esc(fCorta(p.primero))+'. Días que no cuentan:</div><ul style="margin:0;padding-left:18px">'+p.saltados.map(s=>'<li>'+esc(fCorta(s.fecha))+' ('+esc(s.motivo)+')</li>').join('')+'</ul></div></details>':'';
+  const sk=p.saltados.length||p.casilla||p.dist?'<details><summary>Cómo se contó este plazo</summary><div class="small stack" style="margin-top:8px"><div>'+(p.casilla?'Ingresó a la casilla el '+esc(fCorta(e.notif))+' y surtió efectos el '+esc(fCorta(p.efecto)):'Notificado el '+esc(fCorta(e.notif)))+'. El día 1 es el '+esc(fCorta(p.primero))+'. Días que no cuentan:</div><ul style="margin:0;padding-left:18px">'+p.saltados.map(s=>'<li>'+esc(fCorta(s.fecha))+' ('+esc(s.motivo)+')</li>').join('')+'</ul></div></details>':'';
   return '<div class="stack"><div><button class="btn ghost sm" data-action="goexp">'+ic('back')+'Expedientes</button></div>'+
   '<div class="card item big" style="transform:none">'+leaf(p.venc,u.k)+'<div class="stack">'+expHead(e)+
   '<h1 style="font-size:clamp(1.4rem,3.5vw,1.9rem)"'+(done?' class="done-text"':'')+'>'+esc(actoTxt(e))+'</h1>'+
   '<div class="row"><span class="badge '+u.k+'">'+u.txt+'</span><span>Último día: <strong style="text-transform:capitalize">'+esc(fLarga(p.venc))+'</strong></span></div>'+
-  (p.dias?'<div class="small muted">'+p.dias+' días hábiles desde la notificación del '+esc(fCorta(e.notif))+'.'+(p.fuera?' Este plazo pasa de 2027 y faltan feriados de ese año.':'')+'</div>':'')+sk+
+  (p.dias?'<div class="small muted">'+esc(comoTxt(e,p))+(p.fuera?' Este plazo pasa de 2027 y faltan feriados de ese año.':'')+'</div>':'')+sk+
   '<div class="aviso">'+ic('info')+'<span>Lexi es una ayuda. La fecha oficial se verifica siempre en el sistema del Poder Judicial.</span></div>'+
   '<div class="row" style="gap:8px">'+presBtn(e)+
   '<button class="btn danger sm" data-action="del" data-id="'+e.id+'">'+ic('trash')+'Eliminar expediente</button></div></div></div>'+
@@ -745,12 +762,19 @@ function vDet(){
 }
 
 function vReglas(){
-  const rows=[['Contestar demanda','Conocimiento 30 · Abreviado 10 · Sumarísimo 5'],['Apelar sentencia','Conocimiento 10 · Abreviado 10 · Sumarísimo 5'],['Apelar auto','3'],['Recurso de casación','10']];
+  const rows=[['Contestar demanda','Conocimiento 30 · Abreviado 10 · Sumarísimo 5','478 inc. 5 · 491 inc. 5 · 554'],['Apelar sentencia','Conocimiento 10 · Abreviado 5 · Sumarísimo 3','373 · 478 · 491 · 556'],['Apelar auto','3','376 y 377'],['Recurso de casación','10','387']];
+  const reglas=[['Desde cuándo','El plazo se cuenta desde el día siguiente de notificada la resolución; si es común a las partes, desde la última notificación.','Art. 147 CPC'],
+   ['Qué días cuentan','Solo días hábiles: no se cuentan sábados, domingos, feriados ni los días que el Poder Judicial declare inhábiles.','Art. 147 CPC'],
+   ['Casilla electrónica','La notificación surte efectos el segundo día hábil siguiente a su ingreso a la casilla; el plazo corre desde el día siguiente. Lexi lo calcula si eliges «Casilla electrónica».','Art. 155-C LOPJ'],
+   ['Término de la distancia','Se suma al plazo cuando la parte domicilia fuera de la sede del juzgado, según el Cuadro General de Términos de la Distancia del Poder Judicial.','Art. 147 CPC'],
+   ['Plazos perentorios','Vencido el plazo, se pierde el derecho a realizar el acto. Por eso conviene presentar antes del último día.','Art. 146 CPC'],
+   ['Autos en audiencia','Si el auto se dicta en audiencia, la apelación se interpone ahí mismo. Los 3 días de Lexi son para autos dictados fuera de audiencia.','Art. 376 CPC'],
+   ['Alimentos','En el sumarísimo de alimentos la sentencia se apela sin efecto suspensivo, pero el plazo sigue siendo de 3 días.','Art. 556 CPC']];
   const fer=Object.keys(FERIADOS).sort();
   return '<div class="stack"><div class="hero"><span class="eyebrow">Materia civil</span><h1>Reglas de plazos</h1></div>'+
-  '<div class="aviso">'+ic('info')+'<span><strong>Pendiente de validación jurídica.</strong> Estas reglas (materia civil) se tomaron de guías públicas y de la Ley 31591, no del texto del Código Procesal Civil. Un abogado debe revisarlas antes de que alguien confíe en las fechas.</span></div>'+
-  '<div class="card scroll"><table><thead><tr><th>Acto</th><th>Días hábiles</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+r[0]+'</td><td class="num">'+r[1]+'</td></tr>').join('')+'</tbody></table></div>'+
-  '<div class="small muted">El conteo empieza el día siguiente a la notificación y solo cuenta días hábiles. Si la notificación es electrónica, ingresa la fecha en que surte efectos.</div>'+
+  '<div class="aviso">'+ic('info')+'<span><strong>Basadas en el Código Procesal Civil.</strong> Los plazos y la forma de contarlos siguen el texto vigente del CPC (con las modificaciones de las Leyes 31464 y 31591) y el art. 155-C de la Ley Orgánica del Poder Judicial. Lexi es una ayuda: confirma cada fecha en el expediente y, ante la duda, con tu abogado.</span></div>'+
+  '<div class="card scroll"><table><thead><tr><th>Acto</th><th>Días hábiles</th><th>Artículo del CPC</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+r[0]+'</td><td class="num">'+r[1]+'</td><td class="small muted">'+r[2]+'</td></tr>').join('')+'</tbody></table></div>'+
+  '<h2 style="margin-top:10px">Cómo cuenta Lexi los plazos</h2><div class="card scroll"><table><tbody>'+reglas.map(r=>'<tr><td style="font-weight:600;white-space:nowrap">'+r[0]+'</td><td>'+r[1]+'</td><td class="small muted" style="white-space:nowrap">'+r[2]+'</td></tr>').join('')+'</tbody></table></div>'+
   '<h2 style="margin-top:10px">Días inhábiles extra</h2><div class="small muted">Agrega aquí los días que el Poder Judicial declare inhábiles (decretos, paros, cierres). Un día no laborable del sector público no siempre aplica a los juzgados: confirma antes de agregarlo. Los plazos ya cargados se recalculan solos.</div>'+
   '<form class="card stack" data-form="inhabil"><div class="grid2"><label>Fecha<input type="date" id="x-fecha" required></label><label>Motivo<input id="x-mot" required maxlength="60" placeholder="Ej.: resolución administrativa del PJ"></label></div><div><button class="btn" type="submit">'+ic('plus')+'Agregar día inhábil</button></div></form>'+
   (S.extras.length?'<div class="card stack">'+S.extras.slice().sort((a,b)=>a.fecha<b.fecha?-1:1).map(x=>'<div class="row between"><span><span class="mono">'+esc(fCorta(x.fecha))+'</span> · '+esc(x.motivo)+'</span><button class="btn ghost sm" data-action="delx" data-fecha="'+x.fecha+'" aria-label="Eliminar día inhábil del '+esc(fCorta(x.fecha))+'">'+ic('trash')+'<span class="sr-only">Eliminar</span></button></div>').join('')+'</div>':'')+
@@ -838,10 +862,10 @@ document.addEventListener('click',function(ev){
 document.addEventListener('change',function(ev){
   const t=ev.target;
   if(t.dataset&&t.dataset.action==='togglenote'){const n=S.notas.find(x=>x.id===t.dataset.id);if(n){n.hecho=t.checked;save();render()}return}
-  if(t.id==='f-acto'||t.id==='f-proc'||t.id==='f-notif')formPrev();
+  if(t.id==='f-acto'||t.id==='f-proc'||t.id==='f-notif'||t.id==='f-ntipo'||t.id==='f-dist')formPrev();
 });
 document.addEventListener('input',function(ev){
-  if(ev.target.id==='f-notif'||ev.target.id==='f-num')formPrev();
+  if(ev.target.id==='f-notif'||ev.target.id==='f-num'||ev.target.id==='f-dist')formPrev();
   if(ev.target.id==='exp-q'){const q=ev.target.value.trim().toLowerCase();let n=0;document.querySelectorAll('.exp-card').forEach(c=>{const ok=!q||c.dataset.num.includes(q);c.hidden=!ok;if(ok)n++});const e=document.getElementById('exp-none');if(e)e.hidden=n>0}
 });
 document.addEventListener('keydown',function(ev){if((ev.key==='Enter'||ev.key===' ')&&ev.target.classList&&ev.target.classList.contains('exp-card')){ev.preventDefault();ev.target.click()}});
@@ -855,7 +879,7 @@ document.addEventListener('submit',function(ev){
     const acto=g('f-acto').value,a=ACTOS[acto];
     const e={id:uid(),numero:g('f-num').value.trim(),materia:'Civil',acto,proceso:a.proceso?g('f-proc').value:null,estado:'pendiente'};
     if(a.manual){if(!g('f-man').value)return;e.fechaManual=g('f-man').value;e.notif=e.fechaManual;e.descripcion=g('f-desc').value.trim()}
-    else{if(!g('f-notif').value)return;e.notif=g('f-notif').value}
+    else{if(!g('f-notif').value)return;e.notif=g('f-notif').value;e.notifTipo=g('f-ntipo').value;const d=Math.max(0,parseInt(g('f-dist').value,10)||0);if(d)e.distancia=d}
     S.exps.push(e);save();ui.showForm=false;ui.detail=e.id;ui.view='det';ui.sel.det=null;ui.cal.det=null;toast('Expediente guardado');
   }else if(k==='addnote'){
     const key=f.dataset.key,fid=f.dataset.fid||(g('nf-exp-'+key)||{}).value,txt=g('nf-text-'+key).value.trim();
