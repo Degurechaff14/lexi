@@ -750,6 +750,7 @@ function tErr(e){
   if(/at least|weak/i.test(m))return 'La contraseña debe tener al menos 8 caracteres.';
   if(/already registered|already exists/i.test(m))return 'Ese correo ya tiene una cuenta. Inicia sesión.';
   if(/Database error saving new user|duplicate key|unique/i.test(m))return 'Ese nombre de usuario ya está en uso. Elige otro.';
+  if(/Could not find the (function|table)|schema cache|does not exist/i.test(m))return 'Esta función todavía no está activada en el servidor. Avisa a la administración de Lexi.';
   if(/check constraint/i.test(m))return 'Ese nombre de usuario no es válido. Usa de 3 a 30 caracteres.';
   if(/Failed to fetch|NetworkError/i.test(m))return 'No hay conexión con el servidor. Revisa tu internet.';
   return 'No se pudo completar: '+m;

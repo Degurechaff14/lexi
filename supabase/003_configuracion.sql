@@ -61,3 +61,6 @@ end;
 $$;
 revoke all on function public.delete_my_account() from public, anon;
 grant execute on function public.delete_my_account() to authenticated;
+
+-- Recarga la lista de funciones y tablas para que la web las vea al instante.
+notify pgrst, 'reload schema';
