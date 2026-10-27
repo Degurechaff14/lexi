@@ -541,7 +541,7 @@ function render(){
    '<nav aria-label="Secciones"><div class="seg">'+tabs.map(t=>'<button data-action="view" data-v="'+t[0]+'"'+(cur===t[0]?' aria-current="page"':'')+'>'+ic(t[2])+t[1]+'</button>').join('')+'</div></nav>'+
    '<div class="aviso notice">'+ic('info')+'<span><strong>Lexi solo muestra lo que tú cargaste.</strong> Si falta un expediente aquí, no aparecerá su plazo. Verifica siempre la fecha oficial en el sistema del Poder Judicial.</span></div>'+
    '<main class="view'+(entering?' enter':'')+'">'+body+'</main>'+
-   '<div class="foot">'+(saveFailed?'No se pudo guardar en este navegador. Tus cambios se perderán al cerrar la página. ':(user?'Tus datos se guardan en tu cuenta de Lexi. ':'Tus datos se guardan solo en este navegador. '))+'No cargues nombres de clientes ni datos personales.</div>';
+   '<div class="foot">'+(saveFailed?'No se pudo guardar en este navegador. Tus cambios se perderán al cerrar la página. ':(user?'Tus datos se guardan en tu cuenta de Lexi. ':'Tus datos se guardan solo en este navegador. '))+'No cargues nombres de clientes ni datos personales. <a href="privacidad.html" style="color:inherit">Política de privacidad</a></div>';
   if(ui.view==='exp'&&ui.showForm)formPrev();
   syncUI();
 }
@@ -650,7 +650,7 @@ function renderAuth(){
     h='<p class="lead">Cargando tus expedientes…</p>';
   }
   const titles={login:'Inicia sesión',signup:'Crea tu cuenta',code:'Confirma tu correo',forgot:'Recupera tu acceso',reset:'Nueva contraseña',loading:'Un momento'};
-  document.getElementById('app').innerHTML='<div class="auth"><div class="card auth-card"><div class="brand">'+MARK()+'<div><div class="name">lex<span class="i">ı<i></i></span></div><div class="tag">Plazos civiles</div></div></div><h1>'+titles[A.mode]+'</h1>'+h+'<p class="small muted" style="text-align:center;margin:0">Tus expedientes se guardan en tu cuenta. No cargues nombres de clientes ni datos personales.</p></div></div>';
+  document.getElementById('app').innerHTML='<div class="auth"><div class="card auth-card"><div class="brand">'+MARK()+'<div><div class="name">lex<span class="i">ı<i></i></span></div><div class="tag">Plazos civiles</div></div></div><h1>'+titles[A.mode]+'</h1>'+h+'<p class="small muted" style="text-align:center;margin:0">Tus expedientes se guardan en tu cuenta. No cargues nombres de clientes ni datos personales. <a href="privacidad.html">Política de privacidad</a></p></div></div>';
   const first=document.querySelector('.auth-card input:not([value]),.auth-card input[value=""]')||document.querySelector('.auth-card input');if(first&&!A.busy&&!A.err)first.focus();
 }
 function MARK(){return '<svg class="mark" viewBox="0 0 44 44" aria-hidden="true"><rect class="pg" x="2" y="2" width="40" height="40" rx="12"/><rect class="gl" x="11" y="13" width="22" height="19" rx="4"/><path class="gl" d="M11 19h22M17 10v5M27 10v5"/><path class="gl ck" d="M17.5 25.5l3.2 3.2 6-6.4"/></svg>'}
