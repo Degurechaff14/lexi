@@ -136,14 +136,15 @@ textarea{resize:vertical;min-height:70px}
 .done-text{text-decoration:line-through;color:var(--muted)}
 .sect{display:flex;flex-direction:column;gap:10px}
 .sect-h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
-.sect-h small{font:400 .88rem var(--font-body);color:var(--muted);text-transform:capitalize}
+.sect-h small{font:400 .88rem var(--font-body);color:var(--muted);display:inline-block}
+.sect-h small::first-letter,.panel h3::first-letter{text-transform:uppercase}
 .count{font:500 .72rem var(--font-mono);color:var(--muted);background:var(--inhabil);border-radius:999px;padding:2px 8px}
 .empty{border:1.5px dashed var(--line);border-radius:14px;padding:16px;color:var(--muted);font-size:.9rem}
 
 /* hoy: portada y cifras */
 .hero{display:flex;flex-direction:column;gap:6px}
 .hero .eyebrow{font:500 .72rem var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
-.hero h1{text-transform:capitalize}
+.hero h1::first-letter{text-transform:uppercase}
 .hero p{margin:0;color:var(--muted);max-width:60ch}
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 .stat{display:flex;flex-direction:column;gap:2px;padding:14px 16px}
@@ -193,7 +194,7 @@ textarea{resize:vertical;min-height:70px}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);margin-top:12px}
 .legend span{display:flex;gap:6px;align-items:center}
 .panel{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
-.panel h3{text-transform:capitalize}
+
 
 /* barras por materia */
 .bars{display:grid;gap:10px}
@@ -231,6 +232,61 @@ details summary{cursor:pointer;font-weight:600}
 .sync{font:500 .72rem var(--font-mono);color:var(--muted)}
 .sync.err{color:var(--red)}
 .btn[disabled]{opacity:.6;cursor:wait}
+
+/* bienvenida (primer ingreso) */
+.ob{max-width:540px}
+.ob-step{font:500 .7rem var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);text-align:center}
+.ob-bar{display:flex;gap:6px;justify-content:center}
+.ob-bar i{width:34px;height:4px;border-radius:999px;background:var(--line);transition:background-color .3s}
+.ob-bar i.on{background:var(--accent)}
+.ob-opts{display:grid;gap:10px}
+.opt{display:flex;gap:14px;align-items:center;text-align:left;padding:14px 16px;border:1.5px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);cursor:pointer;font:inherit;transition:border-color .2s,background-color .2s,transform .15s}
+.opt:hover{border-color:var(--accent);transform:translateY(-1px)}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.opt .ico{width:40px;height:40px;flex:none;border-radius:11px;background:var(--soft);color:var(--accent);display:grid;place-items:center}
+.opt[aria-pressed="true"] .ico{background:var(--accent);color:var(--accent-ink)}
+.opt .ico .ic{width:20px;height:20px}
+.opt b{display:block;font-weight:600}
+.opt small{display:block;color:var(--muted);font-size:.84rem;line-height:1.4}
+.guides{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.guide{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 10px 12px;border:1.5px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);cursor:pointer;font:inherit;transition:border-color .2s,background-color .2s,transform .15s}
+.guide:hover{border-color:var(--accent);transform:translateY(-2px)}
+.guide[aria-pressed="true"]{border-color:var(--accent);background:var(--soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.guide svg{width:min(120px,100%);height:auto}
+.guide b{font-weight:600}
+.guide small{color:var(--muted);font-size:.8rem}
+.bubble{position:relative;background:var(--soft);color:var(--ink);border-radius:14px;padding:12px 14px;font-size:.93rem;line-height:1.5}
+.bubble::before{content:"";position:absolute;left:28px;top:-7px;width:14px;height:14px;background:inherit;transform:rotate(45deg);border-radius:2px}
+/* abogados ilustrados: toman los colores del tema */
+.av .bg{fill:var(--soft)}
+.av .suit{fill:var(--accent)}
+.av .lap{fill:var(--ink);fill-opacity:.2}
+.av .shirt{fill:var(--surface)}
+.av .tie{fill:var(--ink)}
+.av .ln{fill:none;stroke:var(--ink);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.av .eye{fill:var(--ink)}
+.av .pin{fill:var(--amber)}
+.av .bg,.av .suit,.av .shirt{transition:fill .35s}
+/* recorrido guiado */
+.tour{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(580px,calc(100% - 32px));z-index:30;display:grid;grid-template-columns:84px minmax(0,1fr);gap:14px;align-items:start;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 50px var(--shadow),0 2px 8px var(--shadow)}
+.tour .av{width:84px;height:84px}
+.tour-n{font:600 .72rem var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.tour p{margin:4px 0 0;font-size:.94rem;line-height:1.5}
+.tour p.extra{color:var(--muted);font-size:.86rem}
+.tour-ctl{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:12px}
+.tour-dots{display:flex;gap:5px}
+.tour-dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.tour-dots i.on{background:var(--accent)}
+body.touring{padding-bottom:300px}
+.seg button.hl{outline:3px solid var(--amber);outline-offset:-3px}
+.hl:not(.seg button){position:relative;z-index:6;box-shadow:0 0 0 3px var(--accent),0 0 0 8px var(--soft)!important;border-radius:12px}
+@media (max-width:480px){.tour{grid-template-columns:60px minmax(0,1fr);gap:10px;padding:14px}.tour .av{width:60px;height:60px}.guides{gap:8px}}
+@media (prefers-reduced-motion:no-preference){
+  .tour{animation:tourIn .35s cubic-bezier(.2,.7,.2,1) both}
+  .hl{animation:hlPulse 1.8s ease-in-out infinite}
+  @keyframes tourIn{from{opacity:0;transform:translate(-50%,14px)}to{opacity:1;transform:translate(-50%,0)}}
+  @keyframes hlPulse{0%,100%{box-shadow:0 0 0 3px var(--accent),0 0 0 8px var(--soft)}50%{box-shadow:0 0 0 3px var(--accent),0 0 0 12px var(--soft)}}
+}
 
 /* aviso flotante */
 #toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,16px);opacity:0;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font:500 .88rem var(--font-body);pointer-events:none;z-index:20;max-width:calc(100% - 32px);box-shadow:0 10px 30px var(--shadow);display:flex;gap:8px;align-items:center;transition:opacity .25s,transform .25s}
@@ -530,6 +586,7 @@ function vReglas(){
 /* ---------- render ---------- */
 function render(){
   if(CLOUD&&!user){renderAuth();return}
+  if(user&&profile&&profile.onboarded===false){renderOnboard();return}
   pc.clear();
   const tabs=[['hoy','Hoy y mañana','hoy'],['cal','Calendario','cal'],['exp','Expedientes','exp'],['reglas','Reglas','reglas']];
   const cur=ui.view==='det'?'exp':ui.view;
@@ -537,13 +594,14 @@ function render(){
   const key=ui.view+'|'+(ui.view==='det'?ui.detail:''),entering=key!==lastKey;lastKey=key;
   document.getElementById('app').innerHTML=
    '<header class="top"><div class="brand"><svg class="mark" viewBox="0 0 44 44" aria-hidden="true"><rect class="pg" x="2" y="2" width="40" height="40" rx="12"/><rect class="gl" x="11" y="13" width="22" height="19" rx="4"/><path class="gl" d="M11 19h22M17 10v5M27 10v5"/><path class="gl ck" d="M17.5 25.5l3.2 3.2 6-6.4"/></svg><div><div class="name">lex<span class="i">ı<i></i></span></div><div class="tag">Plazos civiles · versión de prueba</div></div></div>'+
-   '<div class="themes" role="group" aria-label="Tema de color">'+PALETAS.map(p=>'<button class="sw" data-action="palette" data-p="'+p[0]+'" aria-pressed="'+(tema===p[0])+'" aria-label="Tema '+p[1]+'" style="--s1:'+p[2]+';--s2:'+p[3]+'"><i></i><span class="lbl">'+p[1]+'</span></button>').join('')+'</div>'+(user?'<div class="acct"><span class="who">@'+esc(profile&&profile.username||user.email)+'</span><span id="sync" class="sync"></span><button class="btn ghost sm" data-action="logout">Cerrar sesión</button></div>':'')+'</header>'+
+   '<div class="themes" role="group" aria-label="Tema de color">'+PALETAS.map(p=>'<button class="sw" data-action="palette" data-p="'+p[0]+'" aria-pressed="'+(tema===p[0])+'" aria-label="Tema '+p[1]+'" style="--s1:'+p[2]+';--s2:'+p[3]+'"><i></i><span class="lbl">'+p[1]+'</span></button>').join('')+'</div>'+(user?'<div class="acct"><span class="who">@'+esc(profile&&profile.username||user.email)+'</span><span id="sync" class="sync"></span><button class="btn ghost sm" data-action="tour-start">Guía</button><button class="btn ghost sm" data-action="logout">Cerrar sesión</button></div>':'')+'</header>'+
    '<nav aria-label="Secciones"><div class="seg">'+tabs.map(t=>'<button data-action="view" data-v="'+t[0]+'"'+(cur===t[0]?' aria-current="page"':'')+'>'+ic(t[2])+t[1]+'</button>').join('')+'</div></nav>'+
    '<div class="aviso notice">'+ic('info')+'<span><strong>Lexi solo muestra lo que tú cargaste.</strong> Si falta un expediente aquí, no aparecerá su plazo. Verifica siempre la fecha oficial en el sistema del Poder Judicial.</span></div>'+
    '<main class="view'+(entering?' enter':'')+'">'+body+'</main>'+
    '<div class="foot">'+(saveFailed?'No se pudo guardar en este navegador. Tus cambios se perderán al cerrar la página. ':(user?'Tus datos se guardan en tu cuenta de Lexi. ':'Tus datos se guardan solo en este navegador. '))+'No cargues nombres de clientes ni datos personales. <a href="privacidad.html" style="color:inherit">Política de privacidad</a></div>';
   if(ui.view==='exp'&&ui.showForm)formPrev();
   syncUI();
+  renderTour();
 }
 
 /* ---------- datos de ejemplo ---------- */
@@ -572,6 +630,8 @@ document.addEventListener('click',function(ev){
   const a=el.dataset.action,id=el.dataset.id;
   if(a==='togglenote')return;
   if(a.startsWith('auth')||a==='logout'){authAction(a,el);return}
+  if(a.startsWith('ob-')){obAction(a,el);return}
+  if(a.startsWith('tour-')){tourAction(a);return}
   if(a==='view'){ui.view=el.dataset.v;ui.showForm=false}
   else if(a==='palette'){tema=el.dataset.p;applyTema();try{localStorage.setItem(TKEY,tema)}catch(e){}toast('Tema '+PALETAS.find(p=>p[0]===tema)[1])}
   else if(a==='open'){ui.detail=id;ui.view='det';ui.confirm=null;ui.sel.det=null;ui.cal.det=null;scrollTo(0,0)}
@@ -596,6 +656,7 @@ document.addEventListener('submit',function(ev){
   const f=ev.target.closest('form[data-form]');if(!f)return;ev.preventDefault();
   const k=f.dataset.form,g=id=>document.getElementById(id);
   if(k.startsWith('auth-')){authSubmit(k,g);return}
+  if(k==='ob-user'){obUser(g);return}
   if(k==='nuevo'){
     const acto=g('f-acto').value,a=ACTOS[acto];
     const e={id:uid(),numero:g('f-num').value.trim(),materia:'Civil',acto,proceso:a.proceso?g('f-proc').value:null,estado:'pendiente'};
@@ -653,6 +714,148 @@ function renderAuth(){
   document.getElementById('app').innerHTML='<div class="auth"><div class="card auth-card"><div class="brand">'+MARK()+'<div><div class="name">lex<span class="i">ı<i></i></span></div><div class="tag">Plazos civiles</div></div></div><h1>'+titles[A.mode]+'</h1>'+h+'<p class="small muted" style="text-align:center;margin:0">Tus expedientes se guardan en tu cuenta. No cargues nombres de clientes ni datos personales. <a href="privacidad.html">Política de privacidad</a></p></div></div>';
   const first=document.querySelector('.auth-card input:not([value]),.auth-card input[value=""]')||document.querySelector('.auth-card input');if(first&&!A.busy&&!A.err)first.focus();
 }
+/* ---------- bienvenida y guía ---------- */
+const NIVELES=[
+ ['practicante','Practicante o estudiante','Estoy aprendiendo a llevar expedientes.','reglas'],
+ ['junior','Asistente junior','Llevo poco tiempo apoyando en un estudio o juzgado.','note'],
+ ['experimentado','Asistente experimentado','Manejo plazos y escritos todos los días.','exp'],
+ ['abogado','Abogado o abogada','Llevo mis propios casos.','check']
+];
+const GUIAS={
+ valeria:{n:'Dra. Valeria',d:'Clara y paso a paso',hi:'Hola, soy la Dra. Valeria. Te explico Lexi paso a paso y sin tecnicismos.'},
+ mateo:{n:'Dr. Mateo',d:'Directo y práctico',hi:'Hola, soy el Dr. Mateo. Te muestro lo esencial para que no se te pase ningún plazo.'}
+};
+function avatar(id){
+  const body='<circle class="bg" cx="60" cy="60" r="58"/>';
+  const suit='<path class="suit" d="M16 122c2-26 18-38 44-38s42 12 44 38z"/><path class="shirt" d="M49 84l11 22 11-22z"/><path class="lap" d="M49 84l11 22-15-9-4-11zM71 84l-11 22 15-9 4-11z"/>';
+  if(id==='mateo'){
+    const sk='#C68B65',hr='#2B2118';
+    return '<svg class="av" viewBox="0 0 120 120" aria-hidden="true">'+body+suit+
+    '<path class="tie" d="M57.5 86h5l2 13-4.5 7-4.5-7z"/>'+
+    '<rect x="53.5" y="68" width="13" height="18" rx="5" fill="'+sk+'"/>'+
+    '<circle cx="39.5" cy="54" r="4.5" fill="'+sk+'"/><circle cx="80.5" cy="54" r="4.5" fill="'+sk+'"/>'+
+    '<ellipse cx="60" cy="51" rx="20.5" ry="23" fill="'+sk+'"/>'+
+    '<path d="M42 58c1 13 9 19 18 19s17-6 18-19c-4 7-10 9-18 9s-14-2-18-9z" fill="'+hr+'" fill-opacity=".92"/>'+
+    '<path d="M39 49c-1-17 10-25 22-25 14 0 22 9 20 25-3-9-10-13-20-13-9 0-17 4-22 13z" fill="'+hr+'"/>'+
+    '<path class="ln" d="M46 44.5h9M65 44.5h9" stroke-width="2.2"/>'+
+    '<rect class="ln" x="44.5" y="47" width="13" height="9.5" rx="3.5"/><rect class="ln" x="62.5" y="47" width="13" height="9.5" rx="3.5"/><path class="ln" d="M57.5 51.5h5"/>'+
+    '<circle class="eye" cx="51" cy="52" r="1.9"/><circle class="eye" cx="69" cy="52" r="1.9"/>'+
+    '<path class="ln" d="M54.5 64.5q5.5 3.6 11 0" stroke="#FFFFFF" stroke-opacity=".85"/></svg>';
+  }
+  const sk='#E8B795',hr='#4A2C1D';
+  return '<svg class="av" viewBox="0 0 120 120" aria-hidden="true">'+body+
+  '<path d="M35 56c-3-23 9-35 25-35s28 12 25 35l3 32c-8 5-17 2-20-5H52c-3 7-12 10-20 5z" fill="'+hr+'"/>'+
+  suit+'<circle class="pin" cx="78" cy="96" r="2.6"/>'+
+  '<rect x="53.5" y="68" width="13" height="18" rx="5" fill="'+sk+'"/>'+
+  '<ellipse cx="60" cy="51" rx="19.5" ry="22.5" fill="'+sk+'"/>'+
+  '<circle class="pin" cx="40.5" cy="61" r="2"/><circle class="pin" cx="79.5" cy="61" r="2"/>'+
+  '<path d="M40 50c1-15 10-23 21-23 12 0 20 8 19 23-6-8-13-12-22-11-7 1-13 5-18 11z" fill="'+hr+'"/>'+
+  '<path class="ln" d="M46.5 45.5q4.5-2.5 9 0M64.5 45.5q4.5-2.5 9 0"/>'+
+  '<circle class="eye" cx="51" cy="51.5" r="1.9"/><circle class="eye" cx="69" cy="51.5" r="1.9"/>'+
+  '<path class="ln" d="M47.5 49.5l-2-1.5M72.5 49.5l2-1.5" stroke-width="1.3"/>'+
+  '<path d="M54.5 63q5.5 4.5 11 0q-5.5 1.6-11 0z" fill="#B65A5A" stroke="#B65A5A" stroke-width="1.4" stroke-linejoin="round"/></svg>';
+}
+const O={step:0,username:'',nivel:'',guia:'',err:'',busy:false};
+function renderOnboard(){
+  document.body.classList.remove('touring');
+  if(!O.username)O.username=(profile&&profile.username)||'';
+  const bar='<div class="ob-bar" aria-hidden="true">'+[0,1,2].map(i=>'<i class="'+(i<=O.step?'on':'')+'"></i>').join('')+'</div><div class="ob-step">Paso '+(O.step+1)+' de 3</div>';
+  const msg=O.err?'<div class="msg err" role="alert">'+esc(O.err)+'</div>':'';
+  let h='';
+  if(O.step===0){
+    h='<h1>Elige tu nombre de usuario</h1><p class="lead">Así te verás en Lexi. Puedes dejar el sugerido o cambiarlo.</p>'+
+    '<form class="stack" data-form="ob-user"><label>Nombre de usuario<input id="o-user" required minlength="3" maxlength="20" pattern="[a-z0-9_]{3,20}" autocomplete="username" value="'+esc(O.username)+'"><span class="hint">3 a 20 caracteres: minúsculas, números o guion bajo.</span></label>'+msg+
+    '<button class="btn block" type="submit"'+(O.busy?' disabled':'')+'>'+(O.busy?'Revisando…':'Continuar')+'</button></form>';
+  }else if(O.step===1){
+    h='<h1>¿Cuál es tu experiencia?</h1><p class="lead">Así tu guía sabrá cuánto detalle darte.</p><div class="ob-opts" role="group" aria-label="Nivel de experiencia">'+
+    NIVELES.map(n=>'<button type="button" class="opt" data-action="ob-nivel" data-v="'+n[0]+'" aria-pressed="'+(O.nivel===n[0])+'"><span class="ico">'+ic(n[3])+'</span><span><b>'+n[1]+'</b><small>'+n[2]+'</small></span></button>').join('')+'</div>'+msg+
+    '<button class="btn block" type="button" data-action="ob-next"'+(O.nivel?'':' disabled')+'>Continuar</button><button class="linkbtn" type="button" data-action="ob-back">Volver</button>';
+  }else{
+    const g=GUIAS[O.guia];
+    h='<h1>Elige a tu guía</h1><p class="lead">Te acompañará en un recorrido corto por Lexi.</p><div class="guides" role="group" aria-label="Guía">'+
+    Object.keys(GUIAS).map(k=>'<button type="button" class="guide" data-action="ob-guia" data-v="'+k+'" aria-pressed="'+(O.guia===k)+'">'+avatar(k)+'<b>'+GUIAS[k].n+'</b><small>'+GUIAS[k].d+'</small></button>').join('')+'</div>'+
+    '<div class="bubble" aria-live="polite">'+(g?esc(g.hi):'Toca a uno de los dos para conocerlo.')+'</div>'+msg+
+    '<button class="btn block" type="button" data-action="ob-finish"'+(O.guia&&!O.busy?'':' disabled')+'>'+(O.busy?'Guardando…':'Empezar el recorrido')+'</button><button class="linkbtn" type="button" data-action="ob-back">Volver</button>';
+  }
+  document.getElementById('app').innerHTML='<div class="auth"><div class="card auth-card ob">'+bar+h+'</div></div>';
+  if(O.step===0&&!O.busy){const i=document.getElementById('o-user');if(i)i.focus()}
+}
+async function obUser(g){
+  const v=g('o-user').value.trim().toLowerCase();
+  if(!/^[a-z0-9_]{3,20}$/.test(v)){O.err='Usa de 3 a 20 caracteres: minúsculas, números o guion bajo.';O.username=v;renderOnboard();return}
+  O.username=v;O.err='';
+  if(v!==profile.username){
+    O.busy=true;renderOnboard();
+    const r=await sb.rpc('username_available',{u:v});O.busy=false;
+    if(r.error){O.err=tErr(r.error);renderOnboard();return}
+    if(!r.data){O.err='Ese nombre de usuario ya está en uso. Elige otro.';renderOnboard();return}
+  }
+  O.step=1;renderOnboard();
+}
+async function obAction(a,el){
+  if(a==='ob-nivel'){O.nivel=el.dataset.v;O.err=''}
+  else if(a==='ob-guia'){O.guia=el.dataset.v;O.err=''}
+  else if(a==='ob-next'){if(O.nivel)O.step=2}
+  else if(a==='ob-back'){O.step=Math.max(0,O.step-1);O.err=''}
+  else if(a==='ob-finish'){
+    if(!O.guia||O.busy)return;
+    O.busy=true;renderOnboard();
+    const upd={nivel:O.nivel,guia:O.guia,onboarded:true};
+    if(O.username&&O.username!==profile.username)upd.username=O.username;
+    const {error}=await sb.from('profiles').update(upd).eq('id',user.id);
+    O.busy=false;
+    if(error){
+      if(/duplicate|unique/i.test(error.message)){O.step=0;O.err='Ese nombre de usuario ya está en uso. Elige otro.'}
+      else O.err=tErr(error);
+      renderOnboard();return;
+    }
+    Object.assign(profile,upd);
+    ui.view='hoy';ui.tour={i:0};lastKey=null;scrollTo(0,0);render();return;
+  }
+  renderOnboard();
+}
+function tourSteps(){
+  const nuevo=profile&&(profile.nivel==='practicante'||profile.nivel==='junior');
+  const g=GUIAS[(profile&&profile.guia)||'valeria'];
+  return [
+   {v:'hoy',hl:null,t:g.hi+' Te muestro cómo funciona Lexi en menos de un minuto.'},
+   {v:'hoy',hl:'nav-hoy',t:'Esta es tu pantalla principal: lo que vence hoy, mañana y en los próximos 7 días. La hoja de calendario de cada plazo cambia de color según la urgencia: rojo si vence hoy o mañana, ámbar si es pronto, verde si ya lo presentaste.',x:nuevo?'Cuando presentes el escrito, pulsa «Marcar presentado» para que Lexi deje de alertarte.':''},
+   {v:'cal',hl:'nav-cal',t:'En el Calendario ves todos tus plazos y notas del mes. Los días grises son inhábiles y no cuentan para los plazos. Toca cualquier día para anotar algo, como «llevar anexos».'},
+   {v:'exp',hl:'nav-exp',t:'En Expedientes registras cada caso solo con su número. Eliges el acto, el tipo de proceso y la fecha de notificación, y Lexi calcula el último día y te muestra cómo lo contó.',x:nuevo?'Si no sabes qué tipo de proceso es, revísalo en el auto admisorio o pregúntale a tu abogado.':''},
+   {v:'reglas',hl:'nav-reglas',t:'En Reglas están los plazos que usa Lexi y los feriados. Si el Poder Judicial declara un día inhábil, agrégalo aquí y tus plazos se recalculan solos.'},
+   {v:'hoy',hl:'themes',t:'Arriba cambias los colores de Lexi. Junto a tu nombre está el botón «Guía» para repetir este recorrido y «Cerrar sesión».'},
+   {v:'hoy',hl:null,t:'Un último consejo: Lexi es una ayuda. La fecha oficial siempre se verifica en el sistema del Poder Judicial. ¡Éxitos con tus plazos!'}
+  ];
+}
+function renderTour(){
+  const old=document.getElementById('tour');if(old)old.remove();
+  document.querySelectorAll('.hl').forEach(e=>e.classList.remove('hl'));
+  if(!ui.tour||!user){document.body.classList.remove('touring');return}
+  const st=tourSteps(),i=ui.tour.i,s=st[i],g=GUIAS[(profile&&profile.guia)||'valeria'];
+  document.body.classList.add('touring');
+  if(s.hl){const t=s.hl.startsWith('nav-')?document.querySelector('.seg [data-v="'+s.hl.slice(4)+'"]'):document.querySelector('.'+s.hl);if(t){t.classList.add('hl');try{t.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'})}catch(e){}}}
+  const el=document.createElement('div');el.id='tour';el.className='tour';el.setAttribute('role','dialog');el.setAttribute('aria-label','Guía de Lexi');
+  el.innerHTML=avatar((profile&&profile.guia)||'valeria')+'<div><div class="tour-n">'+g.n+'</div><p>'+esc(s.t)+'</p>'+(s.x?'<p class="extra">'+esc(s.x)+'</p>':'')+
+    '<div class="tour-ctl"><div class="tour-dots" aria-label="Paso '+(i+1)+' de '+st.length+'">'+st.map((_,k)=>'<i class="'+(k===i?'on':'')+'"></i>').join('')+'</div><div class="row" style="gap:6px">'+
+    (i===st.length-1?'':'<button class="btn ghost sm" data-action="tour-skip">Saltar</button>')+
+    (i>0?'<button class="btn ghost sm" data-action="tour-prev">Atrás</button>':'')+
+    '<button class="btn sm" data-action="tour-next">'+(i===st.length-1?'Empezar':'Siguiente')+'</button></div></div></div>';
+  document.body.appendChild(el);
+  const nb=el.querySelector('[data-action="tour-next"]');if(nb)nb.focus({preventScroll:true});
+}
+function tourAction(a){
+  if(a==='tour-start'){ui.tour={i:0}}
+  else if(a==='tour-skip'){ui.tour=null}
+  else if(ui.tour){
+    const n=tourSteps().length;
+    ui.tour.i+=a==='tour-next'?1:-1;
+    if(ui.tour.i>=n){ui.tour=null;toast('¡Listo! Ya puedes usar Lexi')}
+    else if(ui.tour.i<0)ui.tour.i=0;
+  }
+  if(ui.tour){const v=tourSteps()[ui.tour.i].v;if(ui.view!==v){ui.view=v;ui.showForm=false;scrollTo(0,0)}}
+  render();
+}
+addEventListener('keydown',e=>{if(e.key==='Escape'&&ui.tour){ui.tour=null;render()}});
 function MARK(){return '<svg class="mark" viewBox="0 0 44 44" aria-hidden="true"><rect class="pg" x="2" y="2" width="40" height="40" rx="12"/><rect class="gl" x="11" y="13" width="22" height="19" rx="4"/><path class="gl" d="M11 19h22M17 10v5M27 10v5"/><path class="gl ck" d="M17.5 25.5l3.2 3.2 6-6.4"/></svg>'}
 function setA(o){Object.assign(A,o);renderAuth()}
 async function authAction(a,el){
@@ -700,10 +903,11 @@ async function enterApp(session){
   user=session.user;Object.assign(A,{busy:false,gbusy:false,mode:'loading',pw:'',pw2:'',err:'',ok:''});renderAuth();
   S={exps:[],notas:[],extras:[],ejemplos:false};
   const [pr,ud]=await Promise.all([
-    sb.from('profiles').select('username').eq('id',user.id).maybeSingle(),
+    sb.from('profiles').select('username,nivel,guia,onboarded').eq('id',user.id).maybeSingle(),
     sb.from('user_data').select('data').eq('user_id',user.id).maybeSingle()
   ]);
   profile=pr.data||null;
+  if(pr.error){const p2=await sb.from('profiles').select('username').eq('id',user.id).maybeSingle();profile=p2.data?Object.assign(p2.data,{onboarded:true}):null}
   if(ud.error){
     if(!load()){A.mode='login';A.err='No se pudieron cargar tus datos: '+tErr(ud.error);user=null;await sb.auth.signOut();renderAuth();return}
     sync='err';

@@ -5,6 +5,9 @@
 create table if not exists public.profiles (
   id uuid primary key references auth.users on delete cascade,
   username text unique not null check (username ~ '^[a-z0-9_]{3,20}$'),
+  nivel text check (nivel in ('practicante','junior','experimentado','abogado')),
+  guia text check (guia in ('valeria','mateo')),
+  onboarded boolean not null default false,
   created_at timestamptz not null default now()
 );
 
