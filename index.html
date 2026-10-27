@@ -633,7 +633,7 @@ function tErr(e){
 function renderAuth(){
   const msg=(A.err?'<div class="msg err" role="alert">'+esc(A.err)+'</div>':'')+(A.ok?'<div class="msg ok" role="status">'+esc(A.ok)+'</div>':'');
   const dis=A.busy?' disabled':'';
-  const google='<button class="btn btn-google block" type="button" data-action="auth-google"'+dis+'>'+GOOGLE+'Continuar con Google</button><div class="divider">o con tu correo</div>';
+  const google='<button class="btn btn-google block" type="button" data-action="auth-google"'+(A.busy||A.gbusy?' disabled':'')+'>'+GOOGLE+(A.gbusy?'Abriendo Google…':'Continuar con Google')+'</button><div class="divider">o con tu correo</div>';
   const tabs='<div class="seg" role="tablist"><button type="button" data-action="auth-mode" data-m="login"'+(A.mode==='login'?' aria-current="page"':'')+'>Iniciar sesión</button><button type="button" data-action="auth-mode" data-m="signup"'+(A.mode==='signup'?' aria-current="page"':'')+'>Crear cuenta</button></div>';
   let h='';
   if(A.mode==='login'){
@@ -658,7 +658,7 @@ function setA(o){Object.assign(A,o);renderAuth()}
 async function authAction(a,el){
   if(a==='logout'){await sb.auth.signOut();try{localStorage.removeItem(storeKey())}catch(e){}user=null;profile=null;S={exps:[],notas:[],extras:[],ejemplos:false};lastKey=null;setA({mode:'login',err:'',ok:'',busy:false});return}
   if(a==='auth-mode'){setA({mode:el.dataset.m,err:'',ok:'',pw:'',pw2:''});return}
-  if(a==='auth-google'){setA({busy:true,err:''});const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:SITE}});if(error)setA({busy:false,err:tErr(error)});return}
+  if(a==='auth-google'){setA({gbusy:true,err:'',ok:''});const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:SITE}});if(error)setA({gbusy:false,err:tErr(error)});return}
   if(a==='auth-resend'){setA({busy:true,err:'',ok:''});const {error}=await sb.auth.resend({type:'signup',email:A.email,options:{emailRedirectTo:SITE}});setA({busy:false,err:error?tErr(error):'',ok:error?'':'Te enviamos un código nuevo.'});return}
 }
 async function authSubmit(k,g){
@@ -697,7 +697,7 @@ async function authSubmit(k,g){
   }
 }
 async function enterApp(session){
-  user=session.user;Object.assign(A,{busy:false,mode:'loading',pw:'',pw2:'',err:'',ok:''});renderAuth();
+  user=session.user;Object.assign(A,{busy:false,gbusy:false,mode:'loading',pw:'',pw2:'',err:'',ok:''});renderAuth();
   S={exps:[],notas:[],extras:[],ejemplos:false};
   const [pr,ud]=await Promise.all([
     sb.from('profiles').select('username').eq('id',user.id).maybeSingle(),
@@ -722,7 +722,14 @@ async function enterApp(session){
 function bootCloud(){
   sb=window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseKey);
   const hp=new URLSearchParams(location.hash.slice(1)+'&'+location.search.slice(1));
-  if(hp.get('error_description'))A.err='No se pudo entrar con Google: '+hp.get('error_description');
+  if(hp.get('error')||hp.get('error_description')){
+    const code=hp.get('error')||'',desc=hp.get('error_description')||'';
+    A.err=/access_denied|cancel/i.test(code+desc)?'Cancelaste el inicio de sesión con Google. Puedes intentarlo otra vez o entrar con tu correo.':'No se pudo entrar con Google: '+desc;
+    history.replaceState(null,'',SITE);
+  }
+  /* Al volver con el botón Atrás, el navegador restaura la página tal como quedó: se reactivan los botones. */
+  addEventListener('pageshow',e=>{if(e.persisted&&!user){A.busy=false;A.gbusy=false;renderAuth()}});
+  addEventListener('focus',()=>{if(A.gbusy&&!user)setTimeout(()=>{if(A.gbusy&&!user){A.gbusy=false;renderAuth()}},1500)});
   sb.auth.onAuthStateChange((ev,session)=>{
     setTimeout(()=>{
       if(session&&(!user||user.id!==session.user.id)){if(location.hash.includes('access_token'))history.replaceState(null,'',SITE);enterApp(session)}
