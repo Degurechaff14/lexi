@@ -288,6 +288,54 @@ body.touring{padding-bottom:300px}
   @keyframes hlPulse{0%,100%{box-shadow:0 0 0 3px var(--accent),0 0 0 8px var(--soft)}50%{box-shadow:0 0 0 3px var(--accent),0 0 0 12px var(--soft)}}
 }
 
+/* carnet del guía, configuración y ventanas */
+.hdr-r{display:flex;align-items:center;gap:10px;margin-left:auto;flex:none}
+.top:has(.hdr-r){flex-wrap:nowrap}
+.top .brand{min-width:0}
+.top .brand>div{min-width:0}
+.carnet{position:relative;display:flex;align-items:center;gap:11px;padding:7px 16px 7px 7px;background:var(--surface);border:1px solid var(--line);border-radius:14px;cursor:pointer;color:var(--ink);font:inherit;box-shadow:0 2px 10px var(--shadow);transition:transform .2s,box-shadow .2s,background-color .35s,border-color .35s}
+.carnet::before{content:"";position:absolute;top:-4px;left:32px;width:20px;height:7px;border-radius:4px;background:var(--surface);border:1px solid var(--line)}
+.carnet:hover{transform:translateY(-2px);box-shadow:0 10px 24px var(--shadow)}
+.c-photo{position:relative;display:block;flex:none;width:52px;height:64px;border-radius:9px;overflow:hidden;background:var(--soft);box-shadow:inset 0 0 0 1px var(--line);transition:background-color .35s}
+.c-photo svg{position:absolute;width:88px;height:88px;left:-18px;top:-6px}
+.c-photo .bg{display:none}
+.c-txt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;line-height:1.2;text-align:left}
+.c-lbl{font:500 .6rem var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.c-txt b{font:600 1rem var(--font-display)}
+.c-sub{font-size:.72rem;color:var(--muted)}
+.gear-w{position:relative}
+.gear{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:grid;place-items:center;cursor:pointer;transition:background-color .2s,border-color .2s}
+.gear:hover,.gear[aria-expanded="true"]{background:var(--soft);border-color:var(--accent)}
+.gear .ic{width:21px;height:21px;transition:transform .4s}
+.gear[aria-expanded="true"] .ic{transform:rotate(90deg)}
+.pop{position:absolute;right:0;top:calc(100% + 8px);width:340px;max-width:calc(100vw - 32px);z-index:40;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 50px var(--shadow),0 2px 8px var(--shadow);padding:6px}
+.pop-h{display:flex;flex-direction:column;gap:2px;padding:10px 12px 12px;border-bottom:1px solid var(--line)}
+.pop-h span{font-size:.8rem;color:var(--muted);overflow-wrap:anywhere}
+.pop-s{padding:12px;border-bottom:1px solid var(--line)}
+.pop-l{font:500 .64rem var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.pop-th{display:flex;gap:4px;flex-wrap:wrap}
+.pop-th .sw .lbl{display:inline}
+.pop-th .sw{padding:6px 10px 6px 6px}
+.pop-list{display:flex;flex-direction:column;padding:4px 0 0}
+.pop-i{display:flex;gap:11px;align-items:center;width:100%;padding:10px 12px;border:0;background:none;border-radius:10px;color:var(--ink);font:500 .9rem var(--font-body);cursor:pointer;text-align:left;transition:background-color .15s}
+.pop-i .ic{width:18px;height:18px;color:var(--muted)}
+.pop-i:hover{background:var(--soft)}
+.pop-i.danger,.pop-i.danger .ic{color:var(--red)}
+.pop-i.danger:hover{background:var(--red-soft)}
+.modal-bg{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(8,12,22,.5);padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.modal{width:100%;max-width:470px;max-height:calc(100vh - 32px);overflow:auto;display:flex;flex-direction:column;gap:14px;padding:22px}
+.modal h2{font-size:1.35rem}
+.modal .lead{text-align:left}
+.danger-box{background:var(--red-soft);color:var(--red);border-radius:12px;padding:12px 14px;font-size:.88rem}
+.btn.solid-danger{background:var(--red);border-color:var(--red);color:var(--surface)}
+@media (max-width:560px){.c-txt{display:none}.carnet{padding:6px}.carnet::before{left:22px}.pop{position:fixed;left:16px;right:16px;top:auto;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:auto;max-width:none}}
+@media (prefers-reduced-motion:no-preference){
+  .pop,.modal{animation:popIn .22s cubic-bezier(.2,.7,.2,1) both}
+  .modal-bg{animation:fadeIn .2s both}
+  @keyframes popIn{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+}
+
 /* aviso flotante */
 #toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,16px);opacity:0;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font:500 .88rem var(--font-body);pointer-events:none;z-index:20;max-width:calc(100% - 32px);box-shadow:0 10px 30px var(--shadow);display:flex;gap:8px;align-items:center;transition:opacity .25s,transform .25s}
 #toast.show{opacity:1;transform:translate(-50%,0)}
@@ -401,7 +449,13 @@ const ICONS={
  note:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
  prev:'<path d="M15 6l-6 6 6 6"/>',next:'<path d="M9 6l6 6-6 6"/>',
  plus:'<path d="M12 5v14M5 12h14"/>',check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
- open:'<path d="M7 17L17 7M9 7h8v8"/>',back:'<path d="M19 12H5M11 6l-6 6 6 6"/>',undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>'
+ open:'<path d="M7 17L17 7M9 7h8v8"/>',
+ gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+ user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+ mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+ out:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
+ trash:'<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/>',
+ play:'<circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z"/>',back:'<path d="M19 12H5M11 6l-6 6 6 6"/>',undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>'
 };
 const ic=n=>'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICONS[n]+'</svg>';
 
@@ -593,8 +647,7 @@ function render(){
   const body=ui.view==='hoy'?vHoy():ui.view==='cal'?vCal():ui.view==='exp'?vExp():ui.view==='det'?vDet():vReglas();
   const key=ui.view+'|'+(ui.view==='det'?ui.detail:''),entering=key!==lastKey;lastKey=key;
   document.getElementById('app').innerHTML=
-   '<header class="top"><div class="brand"><svg class="mark" viewBox="0 0 44 44" aria-hidden="true"><rect class="pg" x="2" y="2" width="40" height="40" rx="12"/><rect class="gl" x="11" y="13" width="22" height="19" rx="4"/><path class="gl" d="M11 19h22M17 10v5M27 10v5"/><path class="gl ck" d="M17.5 25.5l3.2 3.2 6-6.4"/></svg><div><div class="name">lex<span class="i">ı<i></i></span></div><div class="tag">Plazos civiles · versión de prueba</div></div></div>'+
-   '<div class="themes" role="group" aria-label="Tema de color">'+PALETAS.map(p=>'<button class="sw" data-action="palette" data-p="'+p[0]+'" aria-pressed="'+(tema===p[0])+'" aria-label="Tema '+p[1]+'" style="--s1:'+p[2]+';--s2:'+p[3]+'"><i></i><span class="lbl">'+p[1]+'</span></button>').join('')+'</div>'+(user?'<div class="acct"><span class="who">@'+esc(profile&&profile.username||user.email)+'</span><span id="sync" class="sync"></span><button class="btn ghost sm" data-action="tour-start">Guía</button><button class="btn ghost sm" data-action="logout">Cerrar sesión</button></div>':'')+'</header>'+
+   headerHTML()+
    '<nav aria-label="Secciones"><div class="seg">'+tabs.map(t=>'<button data-action="view" data-v="'+t[0]+'"'+(cur===t[0]?' aria-current="page"':'')+'>'+ic(t[2])+t[1]+'</button>').join('')+'</div></nav>'+
    '<div class="aviso notice">'+ic('info')+'<span><strong>Lexi solo muestra lo que tú cargaste.</strong> Si falta un expediente aquí, no aparecerá su plazo. Verifica siempre la fecha oficial en el sistema del Poder Judicial.</span></div>'+
    '<main class="view'+(entering?' enter':'')+'">'+body+'</main>'+
@@ -602,6 +655,7 @@ function render(){
   if(ui.view==='exp'&&ui.showForm)formPrev();
   syncUI();
   renderTour();
+  renderModal();
 }
 
 /* ---------- datos de ejemplo ---------- */
@@ -626,12 +680,19 @@ function seed(){
 
 /* ---------- eventos ---------- */
 document.addEventListener('click',function(ev){
-  const el=ev.target.closest('[data-action]');if(!el)return;
+  const el=ev.target.closest('[data-action]');
+  if(ui.cfg&&!ev.target.closest('.gear-w')){ui.cfg=null;ui.cfgErr='';ui.nameDraft=null;if(!el){render();return}}
+  if(!el)return;
   const a=el.dataset.action,id=el.dataset.id;
   if(a==='togglenote')return;
   if(a.startsWith('auth')||a==='logout'){authAction(a,el);return}
   if(a.startsWith('ob-')){obAction(a,el);return}
-  if(a.startsWith('tour-')){tourAction(a);return}
+  if(a.startsWith('tour-')){ui.cfg=null;tourAction(a);return}
+  if(a==='cfg-toggle'){ui.cfg=ui.cfg?null:'menu';ui.cfgErr='';ui.nameDraft=null;render();return}
+  if(a==='cfg-menu'){ui.cfg='menu';ui.cfgErr='';ui.nameDraft=null;render();return}
+  if(a==='cfg-name'){ui.cfg='name';ui.cfgErr='';render();const i=document.getElementById('c-name');if(i){i.focus();i.select()}return}
+  if(a==='cfg-msg'||a==='cfg-del'){ui.cfg=null;ui.modal=a==='cfg-msg'?'msg':'del';ui.mErr='';ui.mVals=null;render();return}
+  if(a==='modal-close'){if(!ui.busy){ui.modal=null;renderModal()}return}
   if(a==='view'){ui.view=el.dataset.v;ui.showForm=false}
   else if(a==='palette'){tema=el.dataset.p;applyTema();try{localStorage.setItem(TKEY,tema)}catch(e){}toast('Tema '+PALETAS.find(p=>p[0]===tema)[1])}
   else if(a==='open'){ui.detail=id;ui.view='det';ui.confirm=null;ui.sel.det=null;ui.cal.det=null;scrollTo(0,0)}
@@ -657,6 +718,7 @@ document.addEventListener('submit',function(ev){
   const k=f.dataset.form,g=id=>document.getElementById(id);
   if(k.startsWith('auth-')){authSubmit(k,g);return}
   if(k==='ob-user'){obUser(g);return}
+  if(k.startsWith('cfg-')){cfgSubmit(k,g);return}
   if(k==='nuevo'){
     const acto=g('f-acto').value,a=ACTOS[acto];
     const e={id:uid(),numero:g('f-num').value.trim(),materia:'Civil',acto,proceso:a.proceso?g('f-proc').value:null,estado:'pendiente'};
@@ -687,7 +749,8 @@ function tErr(e){
   if(/rate limit|security purposes|too many/i.test(m))return 'Demasiados intentos seguidos. Espera unos minutos y vuelve a intentar.';
   if(/at least|weak/i.test(m))return 'La contraseña debe tener al menos 8 caracteres.';
   if(/already registered|already exists/i.test(m))return 'Ese correo ya tiene una cuenta. Inicia sesión.';
-  if(/Database error saving new user|duplicate key/i.test(m))return 'Ese nombre de usuario ya está en uso. Elige otro.';
+  if(/Database error saving new user|duplicate key|unique/i.test(m))return 'Ese nombre de usuario ya está en uso. Elige otro.';
+  if(/check constraint/i.test(m))return 'Ese nombre de usuario no es válido. Usa de 3 a 30 caracteres.';
   if(/Failed to fetch|NetworkError/i.test(m))return 'No hay conexión con el servidor. Revisa tu internet.';
   return 'No se pudo completar: '+m;
 }
@@ -700,7 +763,7 @@ function renderAuth(){
   if(A.mode==='login'){
     h=tabs+google+'<form class="stack" data-form="auth-login"><label>Correo<input type="email" id="a-email" required autocomplete="email" value="'+esc(A.email)+'"></label><label>Contraseña<input type="password" id="a-pass" required autocomplete="current-password" value="'+esc(A.pw)+'"></label>'+msg+'<button class="btn block" type="submit"'+dis+'>'+(A.busy?'Ingresando…':'Iniciar sesión')+'</button></form><div class="row between"><button class="linkbtn" type="button" data-action="auth-mode" data-m="forgot">¿Olvidaste tu contraseña?</button></div>';
   }else if(A.mode==='signup'){
-    h=tabs+google+'<form class="stack" data-form="auth-signup"><label>Nombre de usuario<input id="a-user" required minlength="3" maxlength="20" pattern="[a-z0-9_]{3,20}" autocomplete="username" placeholder="ej.: arles_practicante" value="'+esc(A.user)+'"><span class="hint">3 a 20 caracteres: minúsculas, números o guion bajo.</span></label><label>Correo<input type="email" id="a-email" required autocomplete="email" value="'+esc(A.email)+'"></label><label>Contraseña<input type="password" id="a-pass" required minlength="8" autocomplete="new-password" value="'+esc(A.pw)+'"><span class="hint">Mínimo 8 caracteres.</span></label><label>Repite la contraseña<input type="password" id="a-pass2" required minlength="8" autocomplete="new-password" value="'+esc(A.pw2)+'"></label>'+msg+'<button class="btn block" type="submit"'+dis+'>'+(A.busy?'Creando cuenta…':'Crear cuenta')+'</button></form>';
+    h=tabs+google+'<form class="stack" data-form="auth-signup"><label>Nombre de usuario<input id="a-user" required minlength="3" maxlength="30" autocomplete="nickname" placeholder="Ej.: Arles Red" value="'+esc(A.user)+'"><span class="hint">De 3 a 30 caracteres. Puedes usar mayúsculas, espacios y tildes.</span></label><label>Correo<input type="email" id="a-email" required autocomplete="email" value="'+esc(A.email)+'"></label><label>Contraseña<input type="password" id="a-pass" required minlength="8" autocomplete="new-password" value="'+esc(A.pw)+'"><span class="hint">Mínimo 8 caracteres.</span></label><label>Repite la contraseña<input type="password" id="a-pass2" required minlength="8" autocomplete="new-password" value="'+esc(A.pw2)+'"></label>'+msg+'<button class="btn block" type="submit"'+dis+'>'+(A.busy?'Creando cuenta…':'Crear cuenta')+'</button></form>';
   }else if(A.mode==='code'){
     h='<form class="stack" data-form="auth-code"><p class="lead">Te enviamos un código de confirmación a <strong>'+esc(A.email)+'</strong>. Revisa también la carpeta de spam.</p><label>Código<input id="a-code" class="code-input" required inputmode="numeric" autocomplete="one-time-code" minlength="6" maxlength="10" pattern="[0-9]{6,10}"></label>'+msg+'<button class="btn block" type="submit"'+dis+'>'+(A.busy?'Verificando…':'Confirmar código')+'</button></form><div class="row between"><button class="linkbtn" type="button" data-action="auth-resend">Reenviar código</button><button class="linkbtn" type="button" data-action="auth-mode" data-m="'+(A.kind==='signup'?'signup':'login')+'">Cambiar correo</button></div>';
   }else if(A.mode==='forgot'){
@@ -714,6 +777,90 @@ function renderAuth(){
   document.getElementById('app').innerHTML='<div class="auth"><div class="card auth-card"><div class="brand">'+MARK()+'<div><div class="name">lex<span class="i">ı<i></i></span></div><div class="tag">Plazos civiles</div></div></div><h1>'+titles[A.mode]+'</h1>'+h+'<p class="small muted" style="text-align:center;margin:0">Tus expedientes se guardan en tu cuenta. No cargues nombres de clientes ni datos personales. <a href="privacidad.html">Política de privacidad</a></p></div></div>';
   const first=document.querySelector('.auth-card input:not([value]),.auth-card input[value=""]')||document.querySelector('.auth-card input');if(first&&!A.busy&&!A.err)first.focus();
 }
+/* ---------- encabezado, configuración y ventanas ---------- */
+const normName=v=>String(v||'').replace(/\s+/g,' ').trim();
+const okName=v=>v.length>=3&&v.length<=30&&!/[<>]/.test(v);
+const dispName=()=>(profile&&profile.username)||(user&&user.email)||'';
+function headerHTML(){
+  const tag=user?'Hola, '+esc(dispName())+' · <span id="sync" class="sync"></span>':'Plazos civiles · versión de prueba';
+  const brand='<div class="brand">'+MARK()+'<div><div class="name">lex<span class="i">ı<i></i></span></div><div class="tag">'+tag+'</div></div></div>';
+  if(!user)return '<header class="top">'+brand+'<div class="themes" role="group" aria-label="Tema de color">'+PALETAS.map(p=>'<button class="sw" data-action="palette" data-p="'+p[0]+'" aria-pressed="'+(tema===p[0])+'" aria-label="Tema '+p[1]+'" style="--s1:'+p[2]+';--s2:'+p[3]+'"><i></i><span class="lbl">'+p[1]+'</span></button>').join('')+'</div></header>';
+  const gid=profile&&profile.guia&&GUIAS[profile.guia]?profile.guia:null;
+  const carnet=gid?'<button class="carnet" data-action="tour-start" aria-label="Tu guía, '+GUIAS[gid].n+'. Ver el recorrido"><span class="c-photo">'+avatar(gid)+'</span><span class="c-txt"><span class="c-lbl">Tu guía</span><b>'+GUIAS[gid].n+'</b><span class="c-sub">Ver recorrido</span></span></button>':'';
+  return '<header class="top">'+brand+'<div class="hdr-r">'+carnet+'<div class="gear-w"><button class="gear" data-action="cfg-toggle" aria-label="Configuración" aria-expanded="'+!!ui.cfg+'">'+ic('gear')+'</button>'+(ui.cfg?cfgPanel():'')+'</div></div></header>';
+}
+function cfgPanel(){
+  const it=(a,i,t,c)=>'<button class="pop-i'+(c?' '+c:'')+'" data-action="'+a+'">'+ic(i)+t+'</button>';
+  let h='<div class="pop" role="dialog" aria-label="Configuración"><div class="pop-h"><b>'+esc(dispName())+'</b><span>'+esc(user.email||'')+'</span></div>'+
+    '<div class="pop-s"><div class="pop-l">Tema</div><div class="pop-th">'+PALETAS.map(p=>'<button class="sw" data-action="palette" data-p="'+p[0]+'" aria-pressed="'+(tema===p[0])+'" style="--s1:'+p[2]+';--s2:'+p[3]+'"><i></i><span class="lbl">'+p[1]+'</span></button>').join('')+'</div></div>';
+  if(ui.cfg==='name'){
+    h+='<form class="pop-s stack" data-form="cfg-name"><label>Nombre de usuario<input id="c-name" required minlength="3" maxlength="30" autocomplete="nickname" value="'+esc(ui.nameDraft!=null?ui.nameDraft:dispName())+'"><span class="hint">De 3 a 30 caracteres.</span></label>'+
+      (ui.cfgErr?'<div class="msg err" role="alert">'+esc(ui.cfgErr)+'</div>':'')+
+      '<div class="row" style="gap:6px"><button class="btn sm" type="submit"'+(ui.busy?' disabled':'')+'>'+(ui.busy?'Guardando…':'Guardar')+'</button><button class="btn ghost sm" type="button" data-action="cfg-menu">Cancelar</button></div></form>';
+  }else{
+    h+='<div class="pop-list">'+it('cfg-name','user','Cambiar nombre de usuario')+it('tour-start','play','Ver la guía otra vez')+it('cfg-msg','mail','Enviar un mensaje')+it('logout','out','Cerrar sesión')+it('cfg-del','trash','Eliminar cuenta','danger')+'</div>';
+  }
+  return h+'</div>';
+}
+function renderModal(){
+  const old=document.getElementById('modal');if(old)old.remove();
+  if(!ui.modal||!user)return;
+  const err=ui.mErr?'<div class="msg err" role="alert">'+esc(ui.mErr)+'</div>':'',dis=ui.busy?' disabled':'',v=ui.mVals||{};
+  let h='';
+  if(ui.modal==='msg'){
+    h='<h2 id="m-t">Enviar un mensaje</h2><p class="lead small">Cuéntanos una duda, un error o una idea. Te responderemos a <strong>'+esc(user.email||'tu correo')+'</strong>.</p>'+
+      '<form class="stack" data-form="cfg-msg"><label>Asunto<input id="m-asunto" required maxlength="120" value="'+esc(v.asunto||'')+'" placeholder="Ej.: No me aparece un plazo"></label>'+
+      '<label>Mensaje<textarea id="m-texto" required maxlength="2000" rows="6" placeholder="Escribe aquí tu mensaje. No incluyas datos de clientes.">'+esc(v.texto||'')+'</textarea></label>'+err+
+      '<div class="row" style="justify-content:flex-end;gap:8px"><button class="btn ghost" type="button" data-action="modal-close">Cancelar</button><button class="btn" type="submit"'+dis+'>'+ic('mail')+(ui.busy?'Enviando…':'Enviar')+'</button></div></form>';
+  }else if(ui.modal==='del'){
+    h='<h2 id="m-t">Eliminar tu cuenta</h2><div class="danger-box">Se borrarán para siempre tu cuenta, tus expedientes, tus notas y tus días inhábiles. <strong>Esto no se puede deshacer.</strong></div>'+
+      '<form class="stack" data-form="cfg-del"><label>Para confirmar, escribe <strong>ELIMINAR</strong><input id="m-conf" required autocomplete="off" value="'+esc(v.conf||'')+'"></label>'+err+
+      '<div class="row" style="justify-content:flex-end;gap:8px"><button class="btn ghost" type="button" data-action="modal-close">Cancelar</button><button class="btn solid-danger" type="submit"'+dis+'>'+ic('trash')+(ui.busy?'Eliminando…':'Eliminar mi cuenta')+'</button></div></form>';
+  }
+  const el=document.createElement('div');el.id='modal';el.className='modal-bg';
+  el.innerHTML='<div class="card modal" role="dialog" aria-modal="true" aria-labelledby="m-t">'+h+'</div>';
+  el.addEventListener('mousedown',e=>{if(e.target===el&&!ui.busy){ui.modal=null;renderModal()}});
+  document.body.appendChild(el);
+  const f=el.querySelector('input,textarea');if(f&&!ui.busy)f.focus();
+}
+async function cfgSubmit(k,g){
+  if(ui.busy)return;
+  if(k==='cfg-name'){
+    const v=normName(g('c-name').value);ui.nameDraft=v;
+    if(!okName(v)){ui.cfgErr='Usa de 3 a 30 caracteres.';render();return}
+    if(v===profile.username){ui.cfg='menu';ui.nameDraft=null;ui.cfgErr='';render();return}
+    ui.busy=true;ui.cfgErr='';render();
+    if(v.toLowerCase()!==String(profile.username).toLowerCase()){
+      const r=await sb.rpc('username_available',{u:v});
+      if(r.error||!r.data){ui.busy=false;ui.cfgErr=r.error?tErr(r.error):'Ese nombre de usuario ya está en uso. Elige otro.';render();return}
+    }
+    const {error}=await sb.from('profiles').update({username:v}).eq('id',user.id);
+    ui.busy=false;
+    if(error){ui.cfgErr=tErr(error);render();return}
+    profile.username=v;ui.cfg='menu';ui.nameDraft=null;toast('Nombre de usuario actualizado');render();
+  }else if(k==='cfg-msg'){
+    const asunto=g('m-asunto').value.trim(),texto=g('m-texto').value.trim();ui.mVals={asunto,texto};
+    if(!asunto||!texto){ui.mErr='Escribe el asunto y el mensaje.';renderModal();return}
+    ui.busy=true;ui.mErr='';renderModal();
+    const {error}=await sb.from('mensajes').insert({asunto,mensaje:texto,email:user.email||null});
+    ui.busy=false;
+    if(error){ui.mErr=tErr(error);renderModal();return}
+    ui.modal=null;ui.mVals=null;renderModal();toast('Mensaje enviado. Te responderemos a tu correo.');
+  }else if(k==='cfg-del'){
+    const conf=g('m-conf').value.trim();ui.mVals={conf};
+    if(conf!=='ELIMINAR'){ui.mErr='Escribe ELIMINAR en mayúsculas para confirmar.';renderModal();return}
+    ui.busy=true;ui.mErr='';renderModal();
+    const {error}=await sb.rpc('delete_my_account');
+    ui.busy=false;
+    if(error){ui.mErr=tErr(error);renderModal();return}
+    try{localStorage.removeItem(storeKey())}catch(e){}
+    ui.modal=null;ui.mVals=null;ui.cfg=null;ui.tour=null;renderModal();
+    try{await sb.auth.signOut()}catch(e){}
+    user=null;profile=null;S={exps:[],notas:[],extras:[],ejemplos:false};lastKey=null;
+    setA({mode:'login',err:'',ok:'Tu cuenta y todos tus datos fueron eliminados.',busy:false});
+  }
+}
+
 /* ---------- bienvenida y guía ---------- */
 const NIVELES=[
  ['practicante','Practicante o estudiante','Estoy aprendiendo a llevar expedientes.','reglas'],
@@ -721,39 +868,44 @@ const NIVELES=[
  ['experimentado','Asistente experimentado','Manejo plazos y escritos todos los días.','exp'],
  ['abogado','Abogado o abogada','Llevo mis propios casos.','check']
 ];
-const GUIAS={
- valeria:{n:'Dra. Valeria',d:'Clara y paso a paso',hi:'Hola, soy la Dra. Valeria. Te explico Lexi paso a paso y sin tecnicismos.'},
- mateo:{n:'Dr. Mateo',d:'Directo y práctico',hi:'Hola, soy el Dr. Mateo. Te muestro lo esencial para que no se te pase ningún plazo.'}
-};
+const GUIAS={valeria:{n:'Dra. Valeria',yo:'la Dra. Valeria'},mateo:{n:'Dr. Mateo',yo:'el Dr. Mateo'}};
+const hola=g=>'¡Hola! Soy '+g.yo+'. Te acompaño a conocer Lexi paso a paso: qué hay en cada sección y cómo aprovecharla.';
 function avatar(id){
-  const body='<circle class="bg" cx="60" cy="60" r="58"/>';
-  const suit='<path class="suit" d="M16 122c2-26 18-38 44-38s42 12 44 38z"/><path class="shirt" d="M49 84l11 22 11-22z"/><path class="lap" d="M49 84l11 22-15-9-4-11zM71 84l-11 22 15-9 4-11z"/>';
+  const bg='<circle class="bg" cx="60" cy="60" r="58"/>';
+  const sk=id==='mateo'?'#C68B65':'#EDBE9C',skd=id==='mateo'?'#A8714F':'#D49A78',hr=id==='mateo'?'#2B2118':'#4A2C1D',hrl=id==='mateo'?'#4A3A2C':'#6E4430';
+  const neck='<path d="M52.5 68h15v15c-4 3-11 3-15 0z" fill="'+sk+'"/><path d="M52.5 71c4 3.5 11 3.5 15 0v4.5c-4 2.5-11 2.5-15 0z" fill="#000" fill-opacity=".12"/>';
+  const suit='<path class="suit" d="M13 124c2-25 17-37 47-40 30 3 45 15 47 40z"/>'+
+    '<path class="shirt" d="M48.5 84.5c3-1.6 7-2.5 11.5-2.5s8.5.9 11.5 2.5L60 107z"/>'+
+    '<path class="lap" d="M48.5 84.5L60 107l-13-8.5-2.5-12z"/><path class="lap" d="M71.5 84.5L60 107l13-8.5 2.5-12z"/>'+
+    '<circle class="lap" cx="60" cy="114" r="1.6"/><circle class="lap" cx="60" cy="120" r="1.6"/>';
+  const face='<path d="M40.5 49.5c0-14.5 8.7-25 19.5-25s19.5 10.5 19.5 25c0 9.5-3 17-8 21.5-3.2 2.9-7.2 4.5-11.5 4.5s-8.3-1.6-11.5-4.5c-5-4.5-8-12-8-21.5z" fill="'+sk+'"/>'+
+    '<ellipse cx="40.5" cy="54" rx="3.6" ry="5" fill="'+sk+'"/><ellipse cx="79.5" cy="54" rx="3.6" ry="5" fill="'+sk+'"/>'+
+    '<circle cx="47" cy="61" r="4" fill="#E07B7B" fill-opacity=".22"/><circle cx="73" cy="61" r="4" fill="#E07B7B" fill-opacity=".22"/>'+
+    '<ellipse cx="51" cy="52.5" rx="3.4" ry="2.6" fill="#fff"/><ellipse cx="69" cy="52.5" rx="3.4" ry="2.6" fill="#fff"/>'+
+    '<circle cx="51.4" cy="52.6" r="1.9" fill="#2A1C14"/><circle cx="69.4" cy="52.6" r="1.9" fill="#2A1C14"/>'+
+    '<circle cx="52" cy="52" r=".6" fill="#fff"/><circle cx="70" cy="52" r=".6" fill="#fff"/>'+
+    '<path d="M60.5 54.5c-.8 3.2-2 5.4-1.6 6.6.5 1.1 2.3 1.2 3.4.6" fill="none" stroke="'+skd+'" stroke-width="1.4" stroke-linecap="round"/>'+
+    '<path d="M53.8 64.6c1.9 2.6 3.9 3.8 6.2 3.8s4.3-1.2 6.2-3.8c-4.1 1-8.3 1-12.4 0z" fill="#9C4545"/>';
   if(id==='mateo'){
-    const sk='#C68B65',hr='#2B2118';
-    return '<svg class="av" viewBox="0 0 120 120" aria-hidden="true">'+body+suit+
-    '<path class="tie" d="M57.5 86h5l2 13-4.5 7-4.5-7z"/>'+
-    '<rect x="53.5" y="68" width="13" height="18" rx="5" fill="'+sk+'"/>'+
-    '<circle cx="39.5" cy="54" r="4.5" fill="'+sk+'"/><circle cx="80.5" cy="54" r="4.5" fill="'+sk+'"/>'+
-    '<ellipse cx="60" cy="51" rx="20.5" ry="23" fill="'+sk+'"/>'+
-    '<path d="M42 58c1 13 9 19 18 19s17-6 18-19c-4 7-10 9-18 9s-14-2-18-9z" fill="'+hr+'" fill-opacity=".92"/>'+
-    '<path d="M39 49c-1-17 10-25 22-25 14 0 22 9 20 25-3-9-10-13-20-13-9 0-17 4-22 13z" fill="'+hr+'"/>'+
-    '<path class="ln" d="M46 44.5h9M65 44.5h9" stroke-width="2.2"/>'+
-    '<rect class="ln" x="44.5" y="47" width="13" height="9.5" rx="3.5"/><rect class="ln" x="62.5" y="47" width="13" height="9.5" rx="3.5"/><path class="ln" d="M57.5 51.5h5"/>'+
-    '<circle class="eye" cx="51" cy="52" r="1.9"/><circle class="eye" cx="69" cy="52" r="1.9"/>'+
-    '<path class="ln" d="M54.5 64.5q5.5 3.6 11 0" stroke="#FFFFFF" stroke-opacity=".85"/></svg>';
+    return '<svg class="av" viewBox="0 0 120 120" aria-hidden="true">'+bg+neck+suit+
+    '<path class="tie" d="M57.6 85.5h4.8l1.8 4-1.5 12.5L60 106l-2.7-4-1.5-12.5z"/>'+face+
+    '<path d="M44.6 63c2 7 8 11.5 15.4 11.5S73.4 70 75.4 63c-1 7.5-6.6 13.5-15.4 13.5S45.6 70.5 44.6 63z" fill="'+hr+'" fill-opacity=".35"/>'+
+    '<path d="M39.8 51c-1.8-17 8.2-27.5 21.2-27.5 12.4 0 21.5 8.5 19.8 26.5-1.4-5.8-4.4-10-9.4-11.5-6 3.6-16.5 5.4-25.2 4.3-3.2 2-5.4 4.8-6.4 8.2z" fill="'+hr+'"/>'+
+    '<path d="M50 30c5-2.6 12-3 17-.8" fill="none" stroke="'+hrl+'" stroke-width="2" stroke-linecap="round" stroke-opacity=".7"/>'+
+    '<path d="M46 46.3q5-2.4 10 0M64 46.3q5-2.4 10 0" fill="none" stroke="'+hr+'" stroke-width="2.4" stroke-linecap="round"/>'+
+    '<rect class="ln" x="44.2" y="47.8" width="13.6" height="10" rx="4"/><rect class="ln" x="62.2" y="47.8" width="13.6" height="10" rx="4"/><path class="ln" d="M57.8 52h4.4M44.2 51l-3.4-1M75.8 51l3.4-1"/>'+
+    '</svg>';
   }
-  const sk='#E8B795',hr='#4A2C1D';
-  return '<svg class="av" viewBox="0 0 120 120" aria-hidden="true">'+body+
-  '<path d="M35 56c-3-23 9-35 25-35s28 12 25 35l3 32c-8 5-17 2-20-5H52c-3 7-12 10-20 5z" fill="'+hr+'"/>'+
-  suit+'<circle class="pin" cx="78" cy="96" r="2.6"/>'+
-  '<rect x="53.5" y="68" width="13" height="18" rx="5" fill="'+sk+'"/>'+
-  '<ellipse cx="60" cy="51" rx="19.5" ry="22.5" fill="'+sk+'"/>'+
-  '<circle class="pin" cx="40.5" cy="61" r="2"/><circle class="pin" cx="79.5" cy="61" r="2"/>'+
-  '<path d="M40 50c1-15 10-23 21-23 12 0 20 8 19 23-6-8-13-12-22-11-7 1-13 5-18 11z" fill="'+hr+'"/>'+
-  '<path class="ln" d="M46.5 45.5q4.5-2.5 9 0M64.5 45.5q4.5-2.5 9 0"/>'+
-  '<circle class="eye" cx="51" cy="51.5" r="1.9"/><circle class="eye" cx="69" cy="51.5" r="1.9"/>'+
-  '<path class="ln" d="M47.5 49.5l-2-1.5M72.5 49.5l2-1.5" stroke-width="1.3"/>'+
-  '<path d="M54.5 63q5.5 4.5 11 0q-5.5 1.6-11 0z" fill="#B65A5A" stroke="#B65A5A" stroke-width="1.4" stroke-linejoin="round"/></svg>';
+  return '<svg class="av" viewBox="0 0 120 120" aria-hidden="true">'+bg+
+  '<path d="M34.5 58c-4-24 8.5-38.5 25.5-38.5S89.5 34 85.5 58l2.5 31c-6.5 6-16.5 3.5-20-2.5H53c-3.5 6-13.5 8.5-20 2.5z" fill="'+hr+'"/>'+
+  neck+suit+'<circle class="pin" cx="78" cy="97" r="2.6"/>'+face+
+  '<circle class="pin" cx="40" cy="61.5" r="2.1"/><circle class="pin" cx="80" cy="61.5" r="2.1"/>'+
+  '<path d="M40.2 51.5c-.8-15.5 8.6-26.5 21-26.5 11.6 0 19.7 8.4 19 22.5-4.4-6.2-9.8-9.6-16.2-10.6-4.8 6.4-13.6 11.4-23.8 14.6z" fill="'+hr+'"/>'+
+  '<path d="M55 30.5c4-1.8 9.5-1.8 14 .4" fill="none" stroke="'+hrl+'" stroke-width="2" stroke-linecap="round" stroke-opacity=".8"/>'+
+  '<path d="M46.5 46.5q4.5-2.2 9 .2M64.5 46.7q4.5-2.4 9-.2" fill="none" stroke="'+hr+'" stroke-width="1.9" stroke-linecap="round"/>'+
+  '<path d="M47.4 51.3l-1.9-1.2M72.6 51.3l1.9-1.2M48.3 50.2l-1.2-1.6M71.7 50.2l1.2-1.6" stroke="#2A1C14" stroke-width="1" stroke-linecap="round"/>'+
+  '<path d="M53.8 64.6c1.9 2.6 3.9 3.8 6.2 3.8s4.3-1.2 6.2-3.8c-4.1 1-8.3 1-12.4 0z" fill="#B24E5A"/>'+
+  '</svg>';
 }
 const O={step:0,username:'',nivel:'',guia:'',err:'',busy:false};
 function renderOnboard(){
@@ -764,7 +916,7 @@ function renderOnboard(){
   let h='';
   if(O.step===0){
     h='<h1>Elige tu nombre de usuario</h1><p class="lead">Así te verás en Lexi. Puedes dejar el sugerido o cambiarlo.</p>'+
-    '<form class="stack" data-form="ob-user"><label>Nombre de usuario<input id="o-user" required minlength="3" maxlength="20" pattern="[a-z0-9_]{3,20}" autocomplete="username" value="'+esc(O.username)+'"><span class="hint">3 a 20 caracteres: minúsculas, números o guion bajo.</span></label>'+msg+
+    '<form class="stack" data-form="ob-user"><label>Nombre de usuario<input id="o-user" required minlength="3" maxlength="30" autocomplete="nickname" value="'+esc(O.username)+'"><span class="hint">De 3 a 30 caracteres. Puedes usar mayúsculas, espacios y tildes.</span></label>'+msg+
     '<button class="btn block" type="submit"'+(O.busy?' disabled':'')+'>'+(O.busy?'Revisando…':'Continuar')+'</button></form>';
   }else if(O.step===1){
     h='<h1>¿Cuál es tu experiencia?</h1><p class="lead">Así tu guía sabrá cuánto detalle darte.</p><div class="ob-opts" role="group" aria-label="Nivel de experiencia">'+
@@ -773,18 +925,18 @@ function renderOnboard(){
   }else{
     const g=GUIAS[O.guia];
     h='<h1>Elige a tu guía</h1><p class="lead">Te acompañará en un recorrido corto por Lexi.</p><div class="guides" role="group" aria-label="Guía">'+
-    Object.keys(GUIAS).map(k=>'<button type="button" class="guide" data-action="ob-guia" data-v="'+k+'" aria-pressed="'+(O.guia===k)+'">'+avatar(k)+'<b>'+GUIAS[k].n+'</b><small>'+GUIAS[k].d+'</small></button>').join('')+'</div>'+
-    '<div class="bubble" aria-live="polite">'+(g?esc(g.hi):'Toca a uno de los dos para conocerlo.')+'</div>'+msg+
+    Object.keys(GUIAS).map(k=>'<button type="button" class="guide" data-action="ob-guia" data-v="'+k+'" aria-pressed="'+(O.guia===k)+'">'+avatar(k)+'<b>'+GUIAS[k].n+'</b></button>').join('')+'</div>'+
+    '<div class="bubble" aria-live="polite">'+(g?esc(hola(g)):'Toca a quien quieras como guía.')+'</div>'+msg+
     '<button class="btn block" type="button" data-action="ob-finish"'+(O.guia&&!O.busy?'':' disabled')+'>'+(O.busy?'Guardando…':'Empezar el recorrido')+'</button><button class="linkbtn" type="button" data-action="ob-back">Volver</button>';
   }
   document.getElementById('app').innerHTML='<div class="auth"><div class="card auth-card ob">'+bar+h+'</div></div>';
   if(O.step===0&&!O.busy){const i=document.getElementById('o-user');if(i)i.focus()}
 }
 async function obUser(g){
-  const v=g('o-user').value.trim().toLowerCase();
-  if(!/^[a-z0-9_]{3,20}$/.test(v)){O.err='Usa de 3 a 20 caracteres: minúsculas, números o guion bajo.';O.username=v;renderOnboard();return}
+  const v=normName(g('o-user').value);
+  if(!okName(v)){O.err='El nombre de usuario debe tener de 3 a 30 caracteres.';O.username=v;renderOnboard();return}
   O.username=v;O.err='';
-  if(v!==profile.username){
+  if(v.toLowerCase()!==String(profile.username).toLowerCase()){
     O.busy=true;renderOnboard();
     const r=await sb.rpc('username_available',{u:v});O.busy=false;
     if(r.error){O.err=tErr(r.error);renderOnboard();return}
@@ -818,12 +970,12 @@ function tourSteps(){
   const nuevo=profile&&(profile.nivel==='practicante'||profile.nivel==='junior');
   const g=GUIAS[(profile&&profile.guia)||'valeria'];
   return [
-   {v:'hoy',hl:null,t:g.hi+' Te muestro cómo funciona Lexi en menos de un minuto.'},
+   {v:'hoy',hl:'carnet',t:hola(g)+' Me verás siempre aquí arriba, en mi carnet. Tócalo cuando quieras repetir este recorrido.'},
    {v:'hoy',hl:'nav-hoy',t:'Esta es tu pantalla principal: lo que vence hoy, mañana y en los próximos 7 días. La hoja de calendario de cada plazo cambia de color según la urgencia: rojo si vence hoy o mañana, ámbar si es pronto, verde si ya lo presentaste.',x:nuevo?'Cuando presentes el escrito, pulsa «Marcar presentado» para que Lexi deje de alertarte.':''},
    {v:'cal',hl:'nav-cal',t:'En el Calendario ves todos tus plazos y notas del mes. Los días grises son inhábiles y no cuentan para los plazos. Toca cualquier día para anotar algo, como «llevar anexos».'},
    {v:'exp',hl:'nav-exp',t:'En Expedientes registras cada caso solo con su número. Eliges el acto, el tipo de proceso y la fecha de notificación, y Lexi calcula el último día y te muestra cómo lo contó.',x:nuevo?'Si no sabes qué tipo de proceso es, revísalo en el auto admisorio o pregúntale a tu abogado.':''},
    {v:'reglas',hl:'nav-reglas',t:'En Reglas están los plazos que usa Lexi y los feriados. Si el Poder Judicial declara un día inhábil, agrégalo aquí y tus plazos se recalculan solos.'},
-   {v:'hoy',hl:'themes',t:'Arriba cambias los colores de Lexi. Junto a tu nombre está el botón «Guía» para repetir este recorrido y «Cerrar sesión».'},
+   {v:'hoy',hl:'gear',t:'En la tuerca de configuración cambias los colores de Lexi y tu nombre de usuario, nos envías un mensaje, cierras sesión o eliminas tu cuenta.'},
    {v:'hoy',hl:null,t:'Un último consejo: Lexi es una ayuda. La fecha oficial siempre se verifica en el sistema del Poder Judicial. ¡Éxitos con tus plazos!'}
   ];
 }
@@ -855,11 +1007,11 @@ function tourAction(a){
   if(ui.tour){const v=tourSteps()[ui.tour.i].v;if(ui.view!==v){ui.view=v;ui.showForm=false;scrollTo(0,0)}}
   render();
 }
-addEventListener('keydown',e=>{if(e.key==='Escape'&&ui.tour){ui.tour=null;render()}});
+addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(ui.modal&&!ui.busy){ui.modal=null;renderModal()}else if(ui.cfg){ui.cfg=null;render();const gb=document.querySelector('.gear');if(gb)gb.focus()}else if(ui.tour){ui.tour=null;render()}});
 function MARK(){return '<svg class="mark" viewBox="0 0 44 44" aria-hidden="true"><rect class="pg" x="2" y="2" width="40" height="40" rx="12"/><rect class="gl" x="11" y="13" width="22" height="19" rx="4"/><path class="gl" d="M11 19h22M17 10v5M27 10v5"/><path class="gl ck" d="M17.5 25.5l3.2 3.2 6-6.4"/></svg>'}
 function setA(o){Object.assign(A,o);renderAuth()}
 async function authAction(a,el){
-  if(a==='logout'){await sb.auth.signOut();try{localStorage.removeItem(storeKey())}catch(e){}user=null;profile=null;S={exps:[],notas:[],extras:[],ejemplos:false};lastKey=null;setA({mode:'login',err:'',ok:'',busy:false});return}
+  if(a==='logout'){ui.cfg=null;ui.tour=null;await sb.auth.signOut();try{localStorage.removeItem(storeKey())}catch(e){}user=null;profile=null;S={exps:[],notas:[],extras:[],ejemplos:false};lastKey=null;setA({mode:'login',err:'',ok:'',busy:false});return}
   if(a==='auth-mode'){setA({mode:el.dataset.m,err:'',ok:'',pw:'',pw2:''});return}
   if(a==='auth-google'){setA({gbusy:true,err:'',ok:''});const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:SITE}});if(error)setA({gbusy:false,err:tErr(error)});return}
   if(a==='auth-resend'){setA({busy:true,err:'',ok:''});const {error}=await sb.auth.resend({type:'signup',email:A.email,options:{emailRedirectTo:SITE}});setA({busy:false,err:error?tErr(error):'',ok:error?'':'Te enviamos un código nuevo.'});return}
@@ -872,8 +1024,9 @@ async function authSubmit(k,g){
     if(error&&/Email not confirmed/i.test(error.message)){await sb.auth.resend({type:'signup',email,options:{emailRedirectTo:SITE}});setA({busy:false,mode:'code',kind:'signup',err:'',ok:tErr(error)});return}
     if(error)setA({busy:false,err:tErr(error)});
   }else if(k==='auth-signup'){
-    const username=g('a-user').value.trim().toLowerCase(),email=g('a-email').value.trim(),password=g('a-pass').value;
+    const username=normName(g('a-user').value),email=g('a-email').value.trim(),password=g('a-pass').value;
     const pw2=g('a-pass2').value;
+    if(!okName(username)){setA({email,user:username,pw:password,pw2,err:'El nombre de usuario debe tener de 3 a 30 caracteres.'});return}
     if(password!==pw2){setA({email,user:username,pw:password,pw2,err:'Las contraseñas no coinciden.'});return}
     setA({email,user:username,pw:password,pw2,busy:true,err:'',ok:''});
     const av=await sb.rpc('username_available',{u:username});

@@ -4,7 +4,7 @@
 -- Perfil público mínimo: solo el nombre de usuario.
 create table if not exists public.profiles (
   id uuid primary key references auth.users on delete cascade,
-  username text unique not null check (username ~ '^[a-z0-9_]{3,20}$'),
+  username text unique not null check (char_length(btrim(username)) between 3 and 30 and username !~ '[<>]'),
   nivel text check (nivel in ('practicante','junior','experimentado','abogado')),
   guia text check (guia in ('valeria','mateo')),
   onboarded boolean not null default false,
@@ -72,3 +72,5 @@ returns boolean language sql security definer set search_path = public stable as
   select not exists (select 1 from public.profiles where username = lower(u));
 $$;
 grant execute on function public.username_available(text) to anon, authenticated;
+
+-- Después de este archivo, ejecutar también 002_bienvenida.sql y 003_configuracion.sql.
