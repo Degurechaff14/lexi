@@ -456,6 +456,24 @@ kbd{font:500 .75rem var(--font-mono);background:var(--bg);border:1px solid var(-
   .btn.sm{min-height:42px;padding:8px 13px}
   .sect{scroll-margin-top:16px}
 }
+/* configuración en celular: hoja que sube desde abajo, con fondo oscurecido */
+.pop-dim,.pop-x{display:none}
+@media (max-width:620px){
+  .pop-dim{display:block;position:fixed;inset:0;z-index:39;background:rgba(8,12,22,.45)}
+  .pop{position:fixed;left:0!important;right:0!important;bottom:0!important;top:auto;width:auto;max-width:none;max-height:min(86vh,640px);overflow-y:auto;overscroll-behavior:contain;border-radius:22px 22px 0 0;border-bottom:0;padding:8px 8px calc(12px + env(safe-area-inset-bottom,0px));box-shadow:0 -12px 40px rgba(8,12,22,.25)}
+  .pop::before{content:"";display:block;width:40px;height:4px;border-radius:999px;background:var(--line);margin:2px auto 6px}
+  .pop-h{position:relative;padding-right:56px}
+  .pop-x{display:grid;place-items:center;position:absolute;right:4px;top:2px;width:44px;height:44px;border:0;border-radius:12px;background:var(--soft);color:var(--ink);cursor:pointer}
+  .pop-x .ic{width:20px;height:20px}
+  .pop-i{min-height:48px}
+  body.sheet-open{overflow:hidden}
+  .pop-keys{display:none}
+}
+@media (max-width:620px) and (prefers-reduced-motion:no-preference){
+  .pop{animation:sheetUp .28s cubic-bezier(.2,.7,.2,1) both}
+  .pop-dim{animation:fadeIn .2s both}
+  @keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
+}
 </style>
 
 </head>
@@ -800,6 +818,8 @@ function render(){
   /* Cada sección empieza desde arriba, sin heredar el desplazamiento de la anterior */
   if(entering)scrollTo(0,0);
   syncUI();
+  /* En celular la configuración es una hoja inferior: bloquea el desplazamiento del fondo mientras está abierta */
+  document.body.classList.toggle('sheet-open',!!ui.cfg);
   renderTour();
   renderModal();
 }
@@ -957,7 +977,7 @@ function headerHTML(){
 }
 function cfgPanel(){
   const it=(a,i,t,c)=>'<button class="pop-i'+(c?' '+c:'')+'" data-action="'+a+'">'+ic(i)+t+'</button>';
-  let h='<div class="pop" role="dialog" aria-label="Configuración"><div class="pop-h"><b>'+esc(dispName())+'</b><span>'+esc(user.email||'')+'</span></div>'+
+  let h='<div class="pop-dim" data-action="cfg-toggle" aria-hidden="true"></div><div class="pop" role="dialog" aria-label="Configuración"><div class="pop-h"><button class="pop-x" type="button" data-action="cfg-toggle" aria-label="Cerrar configuración"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><b>'+esc(dispName())+'</b><span>'+esc(user.email||'')+'</span></div>'+
     '<div class="pop-s"><div class="pop-l">Tema</div><div class="pop-th">'+PALETAS.map(p=>'<button class="sw" data-action="palette" data-p="'+p[0]+'" aria-pressed="'+(tema===p[0])+'" style="--s1:'+p[2]+';--s2:'+p[3]+'"><i></i><span class="lbl">'+p[1]+'</span></button>').join('')+'</div></div>';
   if(ui.cfg==='name'){
     h+='<form class="pop-s stack" data-form="cfg-name"><label>Nombre de usuario<input id="c-name" required minlength="3" maxlength="30" autocomplete="nickname" value="'+esc(ui.nameDraft!=null?ui.nameDraft:dispName())+'"><span class="hint">De 3 a 30 caracteres.</span></label>'+
