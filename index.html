@@ -476,6 +476,25 @@ kbd{font:500 .75rem var(--font-mono);background:var(--bg);border:1px solid var(-
   .pop-dim{animation:fadeIn .2s both}
   @keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
 }
+/* reglas: tarjetas por acto y lista numerada, sin tablas anchas */
+.rg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:12px}
+.rg{display:flex;flex-direction:column;gap:12px}
+.rg h3{font-size:1.15rem}
+.rg-t{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.rg-t.one{grid-template-columns:1fr}
+.tile{display:flex;flex-direction:column;gap:3px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+.tile .n{font:600 1.7rem/1 var(--font-display);font-variant-numeric:tabular-nums;color:var(--accent)}
+.tile .n small{font:500 .75rem var(--font-body);color:var(--muted);margin-left:4px}
+.tile .l{font:600 .82rem/1.3 var(--font-body);margin-top:4px}
+.tile .a{font-size:.75rem;color:var(--muted)}
+.rl-list{display:flex;flex-direction:column;padding-block:4px}
+.rl{display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;padding:14px 0}
+.rl+.rl{border-top:1px solid var(--line)}
+.rl .k{width:32px;height:32px;border-radius:10px;background:var(--soft);color:var(--accent);display:grid;place-items:center;font:600 .85rem var(--font-body)}
+.rl-h{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.rl-h b{font-weight:600}
+.rl p{margin:4px 0 0;color:var(--muted);font-size:.9rem;line-height:1.55}
+.art{font:600 .72rem var(--font-body);color:var(--accent);background:var(--soft);border-radius:999px;padding:3px 9px;white-space:nowrap}
 </style>
 
 </head>
@@ -782,7 +801,11 @@ function vDet(){
 }
 
 function vReglas(){
-  const rows=[['Contestar demanda','Conocimiento 30 · Abreviado 10 · Sumarísimo 5','478 inc. 5 · 491 inc. 5 · 554'],['Apelar sentencia','Conocimiento 10 · Abreviado 5 · Sumarísimo 3','373 · 478 · 491 · 556'],['Apelar auto','3','376 y 377'],['Recurso de casación','10','387']];
+  /* Una tarjeta por acto con una ficha por tipo de proceso: se lee bien en celular sin tablas anchas */
+  const sola={apel_auto:'Auto dictado fuera de audiencia',casacion:'Desde el día siguiente de notificada'};
+  const tile=(n,l,a)=>'<div class="tile"><span class="n">'+n+'<small>días</small></span><span class="l">'+l+'</span><span class="a">Art. '+a+'</span></div>';
+  const actos=Object.keys(ACTOS).filter(k=>!ACTOS[k].manual).map(k=>{const a=ACTOS[k];
+    return '<article class="card rg"><h3>'+a.label+'</h3><div class="rg-t'+(a.proceso?'':' one')+'">'+(a.proceso?Object.keys(PROCESOS).map(pr=>tile(a.dias[pr],PROCESOS[pr],a.art[pr])).join(''):tile(a.dias,sola[k]||'',a.art))+'</div></article>'}).join('');
   const reglas=[['Desde cuándo','El plazo se cuenta desde el día siguiente de notificada la resolución; si es común a las partes, desde la última notificación.','Art. 147 CPC'],
    ['Qué días cuentan','Solo días hábiles: no se cuentan sábados, domingos, feriados ni los días que el Poder Judicial declare inhábiles.','Art. 147 CPC'],
    ['Casilla electrónica','La notificación surte efectos el segundo día hábil siguiente a su ingreso a la casilla; el plazo corre desde el día siguiente. Lexi lo calcula si eliges «Casilla electrónica».','Art. 155-C LOPJ'],
@@ -793,8 +816,8 @@ function vReglas(){
   const fer=Object.keys(FERIADOS).sort();
   return '<div class="stack"><div class="hero"><span class="eyebrow">Materia civil</span><h1>Reglas de plazos</h1></div>'+
   '<div class="aviso">'+ic('info')+'<span><strong>Basadas en el Código Procesal Civil.</strong> Los plazos y la forma de contarlos siguen el texto vigente del CPC (con las modificaciones de las Leyes 31464 y 31591) y el art. 155-C de la Ley Orgánica del Poder Judicial. Lexi es una ayuda: confirma cada fecha en el expediente y, ante la duda, con tu abogado.</span></div>'+
-  '<div class="card scroll"><table><thead><tr><th>Acto</th><th>Días hábiles</th><th>Artículo del CPC</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+r[0]+'</td><td class="num">'+r[1]+'</td><td class="small muted">'+r[2]+'</td></tr>').join('')+'</tbody></table></div>'+
-  '<h2 style="margin-top:10px">Cómo cuenta Lexi los plazos</h2><div class="card scroll"><table><tbody>'+reglas.map(r=>'<tr><td style="font-weight:600;white-space:nowrap">'+r[0]+'</td><td>'+r[1]+'</td><td class="small muted" style="white-space:nowrap">'+r[2]+'</td></tr>').join('')+'</tbody></table></div>'+
+  '<h2 style="margin-top:8px">Plazos por acto</h2><div class="small muted">Todos en días hábiles del Código Procesal Civil.</div><div class="rg-grid">'+actos+'</div>'+
+  '<h2 style="margin-top:8px">Cómo cuenta Lexi los plazos</h2><div class="card rl-list">'+reglas.map((r,i)=>'<div class="rl"><span class="k" aria-hidden="true">'+(i+1)+'</span><div><div class="rl-h"><b>'+r[0]+'</b><span class="art">'+r[2]+'</span></div><p>'+r[1]+'</p></div></div>').join('')+'</div>'+
   '<h2 style="margin-top:10px">Días inhábiles extra</h2><div class="small muted">Agrega aquí los días que el Poder Judicial declare inhábiles (decretos, paros, cierres). Un día no laborable del sector público no siempre aplica a los juzgados: confirma antes de agregarlo. Los plazos ya cargados se recalculan solos.</div>'+
   '<form class="card stack" data-form="inhabil"><div class="grid2"><label>Fecha<input type="date" id="x-fecha" required></label><label>Motivo<input id="x-mot" required maxlength="60" placeholder="Ej.: resolución administrativa del PJ"></label></div><div><button class="btn" type="submit">'+ic('plus')+'Agregar día inhábil</button></div></form>'+
   (S.extras.length?'<div class="card stack">'+S.extras.slice().sort((a,b)=>a.fecha<b.fecha?-1:1).map(x=>'<div class="row between"><span><span class="mono">'+esc(fCorta(x.fecha))+'</span> · '+esc(x.motivo)+'</span><button class="btn ghost sm" data-action="delx" data-fecha="'+x.fecha+'" aria-label="Eliminar día inhábil del '+esc(fCorta(x.fecha))+'">'+ic('trash')+'<span class="sr-only">Eliminar</span></button></div>').join('')+'</div>':'')+
