@@ -457,6 +457,7 @@ kbd{font:500 .75rem var(--font-mono);background:var(--bg);border:1px solid var(-
   .sect{scroll-margin-top:16px}
 }
 /* configuración en celular: hoja que sube desde abajo, con fondo oscurecido */
+.pop.still,.pop-dim.still{animation:none!important}
 .pop-dim,.pop-x{display:none}
 @media (max-width:620px){
   .pop-dim{display:block;position:fixed;inset:0;z-index:39;background:rgba(8,12,22,.45)}
@@ -467,6 +468,7 @@ kbd{font:500 .75rem var(--font-mono);background:var(--bg);border:1px solid var(-
   .pop-x .ic{width:20px;height:20px}
   .pop-i{min-height:48px}
   body.sheet-open{overflow:hidden}
+  .pop.still,.pop-dim.still{animation:none!important}
   .pop-keys{display:none}
 }
 @media (max-width:620px) and (prefers-reduced-motion:no-preference){
@@ -808,6 +810,8 @@ function render(){
   const cur=ui.view==='det'?'exp':ui.view;
   const body=ui.view==='hoy'?vHoy():ui.view==='cal'?vCal():ui.view==='exp'?vExp():ui.view==='det'?vDet():vReglas();
   const key=ui.view+'|'+(ui.view==='det'?ui.detail:''),entering=key!==lastKey;lastKey=key;
+  /* Si la configuración ya estaba abierta, se redibuja sin animación y en la misma posición */
+  const oldPop=document.querySelector('.pop'),popTop=oldPop?oldPop.scrollTop:0;
   document.getElementById('app').innerHTML=
    '<a class="skip" href="#main">Saltar al contenido</a>'+headerHTML()+
    '<nav aria-label="Secciones"><div class="seg">'+tabs.map(t=>'<button data-action="view" data-v="'+t[0]+'"'+(cur===t[0]?' aria-current="page"':'')+'>'+ic(t[2])+'<span class="tab-l">'+t[1]+'</span><span class="tab-s">'+(t[0]==='hoy'?'Hoy':t[1])+'</span></button>').join('')+'</div></nav>'+
@@ -820,6 +824,7 @@ function render(){
   syncUI();
   /* En celular la configuración es una hoja inferior: bloquea el desplazamiento del fondo mientras está abierta */
   document.body.classList.toggle('sheet-open',!!ui.cfg);
+  if(oldPop&&ui.cfg){document.querySelectorAll('.pop,.pop-dim').forEach(x=>x.classList.add('still'));const np=document.querySelector('.pop');if(np)np.scrollTop=popTop}
   renderTour();
   renderModal();
 }
