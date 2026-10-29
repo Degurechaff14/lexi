@@ -1,36 +1,23 @@
 {
  "voices": {
-  "diego":   {"voice": "es-PE-AlexNeural",   "rate": "+8%",  "pitch": "+0Hz", "fallback": "es-MX-JorgeNeural"},
-  "jefe":    {"voice": "es-MX-JorgeNeural",  "rate": "+2%",  "pitch": "-12Hz", "fallback": "es-US-AlonsoNeural"},
-  "lucia":   {"voice": "es-PE-CamilaNeural", "rate": "+6%",  "pitch": "+0Hz", "fallback": "es-MX-DaliaNeural"},
-  "valeria": {"voice": "es-MX-DaliaNeural",  "rate": "+0%",  "pitch": "+2Hz", "fallback": "es-US-PalomaNeural"},
-  "narr":    {"voice": "es-US-AlonsoNeural", "rate": "-6%",  "pitch": "-2Hz", "fallback": "es-MX-JorgeNeural"}
+  "diego":   {"voice": "es-PE-AlexNeural",   "rate": "+0%",  "pitch": "+0Hz", "fallback": "es-MX-JorgeNeural"},
+  "diegow":  {"voice": "es-PE-AlexNeural",   "rate": "-8%",  "pitch": "-4Hz", "fallback": "es-MX-JorgeNeural"},
+  "jefe":    {"voice": "es-MX-JorgeNeural",  "rate": "-6%",  "pitch": "-14Hz", "fallback": "es-US-AlonsoNeural"},
+  "lucia":   {"voice": "es-PE-CamilaNeural", "rate": "-2%",  "pitch": "+0Hz", "fallback": "es-MX-DaliaNeural"}
  },
  "lines": [
-  ["l01","jefe","¡Diego! ¿Dónde está la contestación del expediente cuatrocientos doce?"],
-  ["l02","diego","¿La contestación? Tranquilo, doctor, vence el viernes."],
-  ["l03","jefe","¡Venció ayer, Diego! ¡Es sumarísimo: cinco días hábiles!"],
-  ["l04","diego","Pucha... es que conté el feriado, luego lo de la casilla electrónica, después me confundí con el sábado..."],
-  ["l05","jefe","¡Los plazos son perentorios! Ahora explícale tú al cliente por qué ya no podemos contestar."],
-  ["l06","diego","Cédulas, casillas, feriados... ¿Cómo hacen los demás para no volverse locos?"],
-  ["l07","lucia","Oye, Diego... ¿todavía cuentas los plazos con los dedos?"],
-  ["l08","diego","¿Y tú cómo haces? A ti nunca se te pasa uno."],
-  ["l09","lucia","Fácil. Uso Lexi. Mira."],
-  ["l10","lucia","Pones el número del expediente, eliges el acto y cómo te notificaron."],
-  ["l11","lucia","Y Lexi calcula el último día: salta fines de semana y feriados, y suma los dos días de la casilla electrónica."],
-  ["l12","diego","¿Y de dónde saca los días?"],
-  ["l13","lucia","Del Código Procesal Civil. Te muestra el artículo y cómo contó cada plazo."],
-  ["l14","lucia","Cada mañana te dice qué vence hoy, mañana y en la semana."],
-  ["l15","diego","¡Y tiene calendario con los días inhábiles!"],
-  ["l16","lucia","Y cuando presentas el escrito, lo marcas. Así de simple."],
-  ["l17","diego","¿Y esta doctora quién es?"],
-  ["l18","valeria","¡Hola! ¿Sabías que la palabra nefasto viene de los días en que Roma no administraba justicia?"],
-  ["l19","diego","¡Hasta datos curiosos tiene!"],
-  ["l20","jefe","Diego... ¿y la apelación del expediente quinientos doce?"],
-  ["l21","diego","Presentada ayer, doctor. Vencía el lunes nueve, y la dejé lista con tiempo."],
-  ["l22","jefe","Vaya, vaya... ¿Y desde cuándo tan puntual?"],
-  ["l23","diego","Desde que uso Lexi."],
-  ["l24","narr","Lexi. Cada día cuenta... y Lexi los cuenta por ti."],
-  ["l25","narr","Gratis, en la web y en tu celular Android."]
+  ["v01","diegow","Lunes, martes... ¿el feriado cuenta?"],
+  ["v02","jefe","Diego..."],
+  ["v03","jefe","¿Y la contestación del cuatrocientos doce?"],
+  ["v04","diego","Tranquilo, doctor. Vence el viernes."],
+  ["v05","jefe","Sumarísimo. Cinco días hábiles."],
+  ["v06","jefe","Venció ayer."],
+  ["v07","lucia","Oye... deja de contar con los dedos. Prueba esto."],
+  ["v08","diegow","Venció ayer... Tenía razón."],
+  ["v09","lucia","Ahora, el que te llegó hoy."],
+  ["v10","jefe","Diego... ¿y la apelación del quinientos doce?"],
+  ["v11","diego","Presentada el viernes, doctor. Vencía hoy."],
+  ["v12","jefe","¿Cómo se llama eso?"],
+  ["v13","diego","Lexi."]
  ]
 }
