@@ -805,7 +805,7 @@ function vDet(){
   return '<div class="stack"><div><button class="btn ghost sm" data-action="goexp">'+ic('back')+'Expedientes</button></div>'+
   '<div class="card item big" style="transform:none">'+leaf(p.venc,u.k)+'<div class="stack">'+expHead(e)+
   '<h1 style="font-size:clamp(1.4rem,3.5vw,1.9rem)"'+(done?' class="done-text"':'')+'>'+esc(actoTxt(e))+'</h1>'+
-  '<div class="row"><span class="badge '+u.k+'">'+u.txt+'</span><span>Último día: <strong style="text-transform:capitalize">'+esc(fLarga(p.venc))+'</strong></span></div>'+
+  '<div class="row"><span class="badge '+u.k+'">'+u.txt+'</span><span>Último día: <strong>'+esc(fLarga(p.venc).replace(/^./,c=>c.toUpperCase()))+'</strong></span></div>'+
   (p.dias?'<div class="small muted">'+esc(comoTxt(e,p))+(p.fuera?' Este plazo pasa de 2027 y faltan feriados de ese año.':'')+'</div>':'')+sk+
   '<div class="aviso">'+ic('info')+'<span>Lexi es una ayuda. La fecha oficial se verifica siempre en el sistema del Poder Judicial.</span></div>'+
   '<div class="row" style="gap:8px">'+presBtn(e)+
