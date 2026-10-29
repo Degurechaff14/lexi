@@ -2,6 +2,9 @@ name: Generar voces del video
 on:
   push:
     branches: [video-voces]
+    paths: ['tts/**', '.github/workflows/voces.yml']
+permissions:
+  contents: write
 jobs:
   tts:
     runs-on: ubuntu-latest
@@ -10,9 +13,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install edge-tts==7.0.2
-      - run: python tts/gen.py
-      - uses: actions/upload-artifact@v4
-        with:
-          name: voces
-          path: voces/
+      - run: pip install edge-tts 2>&1 | tail -3 > pip.log
+      - run: python tts/gen.py > voces.log 2>&1 || true
+      - name: Guardar las voces en la rama
+        run: |
+          mkdir -p voces && mv pip.log voces.log voces/ 2>/dev/null || true
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add voces
+          git commit -m "Voces generadas" || true
+          git push
