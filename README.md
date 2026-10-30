@@ -1,4 +1,4 @@
-# Lexi
+# AdQuem
 
 Agenda de plazos procesales civiles para asistentes legales y practicantes de derecho.
 

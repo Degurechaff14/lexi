@@ -41,22 +41,27 @@ jobs:
           ./gradlew assembleDebug --no-daemon
 
       - name: Renombrar el APK
-        run: cp android-app/android/app/build/outputs/apk/debug/app-debug.apk Lexi.apk
+        run: |
+          cp android-app/android/app/build/outputs/apk/debug/app-debug.apk AdQuem.apk
+          # Copia con el nombre anterior para que los enlaces viejos sigan funcionando
+          cp AdQuem.apk Lexi.apk
 
       - name: Guardar el APK en la ejecución
         uses: actions/upload-artifact@v4
         with:
-          name: Lexi-apk
-          path: Lexi.apk
+          name: AdQuem-apk
+          path: AdQuem.apk
 
       - name: Publicar el APK en Releases
         uses: softprops/action-gh-release@v2
         with:
           tag_name: app-v${{ github.run_number }}
-          name: Lexi para Android (versión ${{ github.run_number }})
+          name: AdQuem para Android (versión ${{ github.run_number }})
           make_latest: true
-          files: Lexi.apk
+          files: |
+            AdQuem.apk
+            Lexi.apk
           body: |
-            APK de prueba de Lexi para Android.
+            APK de prueba de AdQuem para Android.
             Descárgalo en el celular, ábrelo y permite "instalar apps de origen desconocido" si te lo pide.
-            La app abre la web de Lexi, con las mismas cuentas y datos.
+            La app abre la web de AdQuem, con las mismas cuentas y datos.

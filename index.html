@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Lexi · Plazos civiles</title>
-<meta name="description" content="Lexi: agenda de plazos procesales civiles para asistentes legales y practicantes.">
+<title>AdQuem · Plazos civiles</title>
+<meta name="description" content="AdQuem: agenda de plazos procesales civiles para asistentes legales y practicantes.">
 <meta name="theme-color" content="#1E3A8A">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Crect x='2' y='2' width='40' height='40' rx='12' fill='%231E3A8A'/%3E%3Cg fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='11' y='13' width='22' height='19' rx='4'/%3E%3Cpath d='M11 19h22M17 10v5M27 10v5'/%3E%3Cpath d='M17.5 25.5l3.2 3.2 6-6.4' stroke-width='2.8'/%3E%3C/g%3E%3C/svg%3E">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
@@ -78,6 +78,8 @@ h2{font-size:1.35rem} h3{font-size:1.1rem}
 .name .i{position:relative;display:inline-block}
 .name .i i{position:absolute;left:50%;top:.02em;width:.21em;height:.21em;border-radius:50%;background:var(--accent);transform:translateX(-50%);transition:background-color .35s}
 .name{font:700 1.85rem/1 var(--font-body);letter-spacing:-.045em}
+/* marca AdQuem: «ad» en el color del tema, «quem» en tinta */
+.name .ad{color:var(--accent);transition:color .35s}
 .tag{font:500 .7rem var(--font-mono);color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
 .themes{display:flex;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px}
 .sw{display:flex;align-items:center;gap:7px;background:none;border:0;border-radius:999px;padding:6px 11px 6px 7px;color:var(--muted);font:500 .82rem var(--font-body);cursor:pointer;transition:background-color .2s,color .2s}
@@ -522,7 +524,7 @@ kbd{font:500 .75rem var(--font-mono);background:var(--bg);border:1px solid var(-
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
 <script>
-/* Configuración de cuentas (Supabase). Si se dejan vacías, Lexi funciona sin cuentas y guarda todo en el navegador. */
+/* Configuración de cuentas (Supabase). Si se dejan vacías, AdQuem funciona sin cuentas y guarda todo en el navegador. */
 window.LEXI_CONFIG={
   supabaseUrl:'https://bvpswbjidgitsqoyugaa.supabase.co',
   supabaseKey:'sb_publishable_Z4f9JnhfQwBPLow54E5T_w_BTVEV502'
@@ -607,7 +609,7 @@ async function pushCloud(){
   sync=error?'err':'ok';syncUI();
 }
 function syncUI(){const el=document.getElementById('sync');if(!el)return;el.className='sync'+(sync==='err'?' err':sync==='pending'?' pending':'');el.textContent=sync==='pending'?'Guardando…':sync==='err'?'Sin conexión · se guardará al reconectar':'Guardado en tu cuenta'}
-const whereTxt=()=>user?'Los datos se guardan en tu cuenta de Lexi.':'Los datos se guardan únicamente en este navegador.';
+const whereTxt=()=>user?'Los datos se guardan en tu cuenta de AdQuem.':'Los datos se guardan únicamente en este navegador.';
 function load(){try{const r=localStorage.getItem(storeKey());if(r){const o=JSON.parse(r);if(o&&Array.isArray(o.exps))S=Object.assign(S,o);return true}}catch(e){}return false}
 function loadTema(){try{const t=localStorage.getItem(TKEY);if(PALETAS.some(p=>p[0]===t))tema=t}catch(e){}}
 function applyTema(){document.documentElement.setAttribute('data-palette',tema)}
@@ -696,8 +698,8 @@ function vHoy(){
   const pend=x=>x.filter(i=>i.t==='plazo'&&i.e.estado!=='presentado').length;
   const notas=x=>x.filter(i=>i.t==='nota'&&!i.n.hecho).length;
   const urgentes=pend(hoy)+pend(man);
-  if(!S.exps.length)return '<section class="hero"><span class="eyebrow">Tu día</span><h1>'+fLarga(t)+'</h1><p>Todavía no cargaste expedientes. Registra el primero con su número y la fecha de notificación, y Lexi calculará su último día.</p></section>'+
-    '<div class="empty"><span>Puedes empezar con uno tuyo o mirar primero cómo se ve Lexi con ejemplos.</span><div class="row"><button class="btn" data-action="newexp">'+ic('plus')+'Cargar mi primer expediente</button><button class="btn ghost" data-action="seed">Ver ejemplos</button></div></div>';
+  if(!S.exps.length)return '<section class="hero"><span class="eyebrow">Tu día</span><h1>'+fLarga(t)+'</h1><p>Todavía no cargaste expedientes. Registra el primero con su número y la fecha de notificación, y AdQuem calculará su último día.</p></section>'+
+    '<div class="empty"><span>Puedes empezar con uno tuyo o mirar primero cómo se ve AdQuem con ejemplos.</span><div class="row"><button class="btn" data-action="newexp">'+ic('plus')+'Cargar mi primer expediente</button><button class="btn ghost" data-action="seed">Ver ejemplos</button></div></div>';
   const alDia=!urgentes&&!late.length;
   let h='<section class="hero"><span class="eyebrow">Tu día</span><h1>'+fLarga(t)+'</h1>'+(alDia?'<span class="allclear">'+ic('check')+'Todo al día</span>':'')+'<p>'+
     (urgentes?'Tienes '+urgentes+(urgentes===1?' plazo por presentar':' plazos por presentar')+' entre hoy y mañana.':'Nada de lo que cargaste vence hoy ni mañana.')+
@@ -765,7 +767,7 @@ function vExp(){
   h+=list.length?list.map(e=>{const p=plazo(e),u=urg(e,p);
     return '<article class="card item link exp-card" data-action="open" data-id="'+e.id+'" data-num="'+esc(String(e.numero).toLowerCase())+'" tabindex="0" role="button" aria-label="Abrir expediente '+esc(e.numero)+'">'+leaf(p.venc,u.k)+'<div class="stack-sm">'+expHead(e)+
     '<div class="row between"><span class="title">'+esc(actoTxt(e))+'</span><span class="badge '+u.k+'">'+u.txt+'</span></div>'+
-    '<div class="small muted">Último día: '+fCorta(p.venc)+'</div><span class="more">Ver detalle'+ic('next')+'</span></div></article>'}).join(''):'<div class="empty"><span>Aún no tienes expedientes. Registra uno con su número y Lexi calculará su último día.</span>'+(ui.showForm?'':'<button class="btn" data-action="newexp">'+ic('plus')+'Cargar mi primer expediente</button>')+'</div>';
+    '<div class="small muted">Último día: '+fCorta(p.venc)+'</div><span class="more">Ver detalle'+ic('next')+'</span></div></article>'}).join(''):'<div class="empty"><span>Aún no tienes expedientes. Registra uno con su número y AdQuem calculará su último día.</span>'+(ui.showForm?'':'<button class="btn" data-action="newexp">'+ic('plus')+'Cargar mi primer expediente</button>')+'</div>';
   return h+'</div>';
 }
 function formNuevo(){
@@ -788,16 +790,16 @@ function formPrev(){
   const g=id=>document.getElementById(id);if(!g('f-acto'))return;
   const acto=g('f-acto').value,a=ACTOS[acto];
   g('w-proc').hidden=!a.proceso;g('w-notifs').hidden=!!a.manual;g('w-dist').hidden=!!a.manual;
-  const cas=g('f-ntipo').value==='casilla';g('f-notif-h').textContent=cas?'El día en que la notificación ingresó a tu casilla. Lexi suma los 2 días hábiles del art. 155-C de la LOPJ.':'El día en que recibiste la cédula.';g('w-man').hidden=!a.manual;g('w-desc').hidden=!a.manual;
+  const cas=g('f-ntipo').value==='casilla';g('f-notif-h').textContent=cas?'El día en que la notificación ingresó a tu casilla. AdQuem suma los 2 días hábiles del art. 155-C de la LOPJ.':'El día en que recibiste la cédula.';g('w-man').hidden=!a.manual;g('w-desc').hidden=!a.manual;
   const num=g('f-num').value.trim().toLowerCase(),nt0=g('f-notif').value,ws=[];
   if(num&&S.exps.some(x=>String(x.numero).toLowerCase()===num))ws.push('Ya tienes un expediente con este número. Guárdalo igual solo si es otro acto del mismo caso.');
   if(!a.manual&&nt0&&nt0>todayISO())ws.push('La fecha de notificación es posterior a hoy. Revisa que sea la correcta.');
   g('f-warn').innerHTML=ws.map(w=>'<div class="msg warn">'+esc(w)+'</div>').join('');
   const box=g('f-prev');
-  if(a.manual){box.innerHTML='<span class="small">Lexi mostrará la fecha que escribas. No calcula este acto.</span>';return}
+  if(a.manual){box.innerHTML='<span class="small">AdQuem mostrará la fecha que escribas. No calcula este acto.</span>';return}
   const nt=g('f-notif').value;if(!nt){box.textContent='Elige la fecha de notificación.';return}
   const n=a.proceso?a.dias[g('f-proc').value]:a.dias,fe={acto,proceso:a.proceso?g('f-proc').value:null,notif:nt,notifTipo:g('f-ntipo').value,distancia:g('f-dist').value},p=plazoDe(fe,n);
-  box.innerHTML='<div class="item" style="box-shadow:none">'+leaf(p.venc,'calm')+'<div class="stack-sm"><div class="title" style="text-transform:none">Último día: '+esc(fLarga(p.venc))+'</div><div class="small muted">'+esc(comoTxt(fe,p))+' Se saltan '+p.saltados.length+(p.saltados.length===1?' día inhábil.':' días inhábiles.')+(p.fuera?' Atención: este plazo pasa de 2027 y Lexi aún no tiene los feriados de ese año.':'')+' Confirma siempre la fecha en el sistema del Poder Judicial.</div></div></div>';
+  box.innerHTML='<div class="item" style="box-shadow:none">'+leaf(p.venc,'calm')+'<div class="stack-sm"><div class="title" style="text-transform:none">Último día: '+esc(fLarga(p.venc))+'</div><div class="small muted">'+esc(comoTxt(fe,p))+' Se saltan '+p.saltados.length+(p.saltados.length===1?' día inhábil.':' días inhábiles.')+(p.fuera?' Atención: este plazo pasa de 2027 y AdQuem aún no tiene los feriados de ese año.':'')+' Confirma siempre la fecha en el sistema del Poder Judicial.</div></div></div>';
 }
 
 function vDet(){
@@ -811,7 +813,7 @@ function vDet(){
   '<h1 style="font-size:clamp(1.4rem,3.5vw,1.9rem)"'+(done?' class="done-text"':'')+'>'+esc(actoTxt(e))+'</h1>'+
   '<div class="row"><span class="badge '+u.k+'">'+u.txt+'</span><span>Último día: <strong>'+esc(fLarga(p.venc).replace(/^./,c=>c.toUpperCase()))+'</strong></span></div>'+
   (p.dias?'<div class="small muted">'+esc(comoTxt(e,p))+(p.fuera?' Este plazo pasa de 2027 y faltan feriados de ese año.':'')+'</div>':'')+sk+
-  '<div class="aviso">'+ic('info')+'<span>Lexi es una ayuda. La fecha oficial se verifica siempre en el sistema del Poder Judicial.</span></div>'+
+  '<div class="aviso">'+ic('info')+'<span>AdQuem es una ayuda. La fecha oficial se verifica siempre en el sistema del Poder Judicial.</span></div>'+
   '<div class="row" style="gap:8px">'+presBtn(e)+
   '<button class="btn danger sm" data-action="del" data-id="'+e.id+'">'+ic('trash')+'Eliminar expediente</button></div></div></div>'+
   '<h2>Calendario del expediente</h2>'+calendar('det',e.id)+
@@ -826,16 +828,16 @@ function vReglas(){
     return '<article class="card rg"><h3>'+a.label+'</h3><div class="rg-t'+(a.proceso?'':' one')+'">'+(a.proceso?Object.keys(PROCESOS).map(pr=>tile(a.dias[pr],PROCESOS[pr],a.art[pr])).join(''):tile(a.dias,sola[k]||'',a.art))+'</div></article>'}).join('');
   const reglas=[['Desde cuándo','El plazo se cuenta desde el día siguiente de notificada la resolución; si es común a las partes, desde la última notificación.','Art. 147 CPC'],
    ['Qué días cuentan','Solo días hábiles: no se cuentan sábados, domingos, feriados ni los días que el Poder Judicial declare inhábiles.','Art. 147 CPC'],
-   ['Casilla electrónica','La notificación surte efectos el segundo día hábil siguiente a su ingreso a la casilla; el plazo corre desde el día siguiente. Lexi lo calcula si eliges «Casilla electrónica».','Art. 155-C LOPJ'],
+   ['Casilla electrónica','La notificación surte efectos el segundo día hábil siguiente a su ingreso a la casilla; el plazo corre desde el día siguiente. AdQuem lo calcula si eliges «Casilla electrónica».','Art. 155-C LOPJ'],
    ['Término de la distancia','Se suma al plazo cuando la parte domicilia fuera de la sede del juzgado, según el Cuadro General de Términos de la Distancia del Poder Judicial.','Art. 147 CPC'],
    ['Plazos perentorios','Vencido el plazo, se pierde el derecho a realizar el acto. Por eso conviene presentar antes del último día.','Art. 146 CPC'],
-   ['Autos en audiencia','Si el auto se dicta en audiencia, la apelación se interpone ahí mismo. Los 3 días de Lexi son para autos dictados fuera de audiencia.','Art. 376 CPC'],
+   ['Autos en audiencia','Si el auto se dicta en audiencia, la apelación se interpone ahí mismo. Los 3 días de AdQuem son para autos dictados fuera de audiencia.','Art. 376 CPC'],
    ['Alimentos','En el sumarísimo de alimentos la sentencia se apela sin efecto suspensivo, pero el plazo sigue siendo de 3 días.','Art. 556 CPC']];
   const fer=Object.keys(FERIADOS).sort();
   return '<div class="stack"><div class="hero"><span class="eyebrow">Materia civil</span><h1>Reglas de plazos</h1></div>'+
-  '<div class="aviso">'+ic('info')+'<span><strong>Basadas en el Código Procesal Civil.</strong> Los plazos y la forma de contarlos siguen el texto vigente del CPC (con las modificaciones de las Leyes 31464 y 31591) y el art. 155-C de la Ley Orgánica del Poder Judicial. Lexi es una ayuda: confirma cada fecha en el expediente y, ante la duda, con tu abogado.</span></div>'+
+  '<div class="aviso">'+ic('info')+'<span><strong>Basadas en el Código Procesal Civil.</strong> Los plazos y la forma de contarlos siguen el texto vigente del CPC (con las modificaciones de las Leyes 31464 y 31591) y el art. 155-C de la Ley Orgánica del Poder Judicial. AdQuem es una ayuda: confirma cada fecha en el expediente y, ante la duda, con tu abogado.</span></div>'+
   '<h2 style="margin-top:8px">Plazos por acto</h2><div class="small muted">Todos en días hábiles del Código Procesal Civil.</div><div class="rg-grid">'+actos+'</div>'+
-  '<h2 style="margin-top:8px">Cómo cuenta Lexi los plazos</h2><div class="card rl-list">'+reglas.map((r,i)=>'<div class="rl"><span class="k" aria-hidden="true">'+(i+1)+'</span><div><div class="rl-h"><b>'+r[0]+'</b><span class="art">'+r[2]+'</span></div><p>'+r[1]+'</p></div></div>').join('')+'</div>'+
+  '<h2 style="margin-top:8px">Cómo cuenta AdQuem los plazos</h2><div class="card rl-list">'+reglas.map((r,i)=>'<div class="rl"><span class="k" aria-hidden="true">'+(i+1)+'</span><div><div class="rl-h"><b>'+r[0]+'</b><span class="art">'+r[2]+'</span></div><p>'+r[1]+'</p></div></div>').join('')+'</div>'+
   '<h2 style="margin-top:10px">Días inhábiles extra</h2><div class="small muted">Agrega aquí los días que el Poder Judicial declare inhábiles (decretos, paros, cierres). Un día no laborable del sector público no siempre aplica a los juzgados: confirma antes de agregarlo. Los plazos ya cargados se recalculan solos.</div>'+
   '<form class="card stack" data-form="inhabil"><div class="grid2"><label>Fecha<input type="date" id="x-fecha" required></label><label>Motivo<input id="x-mot" required maxlength="60" placeholder="Ej.: resolución administrativa del PJ"></label></div><div><button class="btn" type="submit">'+ic('plus')+'Agregar día inhábil</button></div></form>'+
   (S.extras.length?'<div class="card stack">'+S.extras.slice().sort((a,b)=>a.fecha<b.fecha?-1:1).map(x=>'<div class="row between"><span><span class="mono">'+esc(fCorta(x.fecha))+'</span> · '+esc(x.motivo)+'</span><button class="btn ghost sm" data-action="delx" data-fecha="'+x.fecha+'" aria-label="Eliminar día inhábil del '+esc(fCorta(x.fecha))+'">'+ic('trash')+'<span class="sr-only">Eliminar</span></button></div>').join('')+'</div>':'')+
@@ -856,9 +858,9 @@ function render(){
   document.getElementById('app').innerHTML=
    '<a class="skip" href="#main">Saltar al contenido</a>'+headerHTML()+
    '<nav aria-label="Secciones"><div class="seg">'+tabs.map(t=>'<button data-action="view" data-v="'+t[0]+'"'+(cur===t[0]?' aria-current="page"':'')+'>'+ic(t[2])+'<span class="tab-l">'+t[1]+'</span><span class="tab-s">'+(t[0]==='hoy'?'Hoy':t[1])+'</span></button>').join('')+'</div></nav>'+
-   '<p class="notice-line">'+ic('info')+'<span>Lexi muestra solo lo que cargaste. Verifica siempre la fecha oficial en el sistema del Poder Judicial.</span></p>'+
+   '<p class="notice-line">'+ic('info')+'<span>AdQuem muestra solo lo que cargaste. Verifica siempre la fecha oficial en el sistema del Poder Judicial.</span></p>'+
    '<main id="main" tabindex="-1" class="view'+(entering?' enter':'')+'">'+body+'</main>'+
-   '<div class="foot">'+(saveFailed?'No se pudo guardar en este navegador. Tus cambios se perderán al cerrar la página. ':(user?'Tus datos se guardan en tu cuenta de Lexi. ':'Tus datos se guardan solo en este navegador. '))+'No cargues nombres de clientes ni datos personales. <a href="privacidad.html" style="color:inherit">Política de privacidad</a></div>';
+   '<div class="foot">'+(saveFailed?'No se pudo guardar en este navegador. Tus cambios se perderán al cerrar la página. ':(user?'Tus datos se guardan en tu cuenta de AdQuem. ':'Tus datos se guardan solo en este navegador. '))+'No cargues nombres de clientes ni datos personales. <a href="privacidad.html" style="color:inherit">Política de privacidad</a></div>';
   if(ui.view==='exp'&&ui.showForm)formPrev();
   /* Cada sección empieza desde arriba, sin heredar el desplazamiento de la anterior */
   if(entering)scrollTo(0,0);
@@ -967,7 +969,7 @@ const A={mode:'login',email:'',user:'',pw:'',pw2:'',kind:'signup',err:'',ok:'',b
 const GOOGLE='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.6 12.3c0-.8-.1-1.5-.2-2.2H12v4.2h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-1.9 3.3-4.8 3.3-8z"/><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.7c-1 .7-2.2 1-3.7 1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.8A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.8 14.1a6.6 6.6 0 0 1 0-4.2V7.1H2.1a11 11 0 0 0 0 9.8z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.2-3.2A11 11 0 0 0 2.1 7.1l3.7 2.8C6.7 7.3 9.1 5.4 12 5.4z"/></svg>';
 const SITE=location.origin+location.pathname;
 const INAPP=/LexiApp/.test(navigator.userAgent);
-const APK='https://github.com/Degurechaff14/lexi/releases/latest/download/Lexi.apk';
+const APK='https://github.com/Degurechaff14/lexi/releases/latest/download/AdQuem.apk';
 function tErr(e){
   const m=(e&&e.message)||String(e||'');
   if(/Invalid login credentials/i.test(m))return 'Correo o contraseña incorrectos.';
@@ -977,7 +979,7 @@ function tErr(e){
   if(/at least|weak/i.test(m))return 'La contraseña debe tener al menos 8 caracteres.';
   if(/already registered|already exists/i.test(m))return 'Ese correo ya tiene una cuenta. Inicia sesión.';
   if(/Database error saving new user|duplicate key|unique/i.test(m))return 'Ese nombre de usuario ya está en uso. Elige otro.';
-  if(/Could not find the (function|table)|schema cache|does not exist/i.test(m))return 'Esta función todavía no está activada en el servidor. Avisa a la administración de Lexi.';
+  if(/Could not find the (function|table)|schema cache|does not exist/i.test(m))return 'Esta función todavía no está activada en el servidor. Avisa a la administración de AdQuem.';
   if(/check constraint/i.test(m))return 'Ese nombre de usuario no es válido. Usa de 3 a 30 caracteres.';
   if(/Failed to fetch|NetworkError/i.test(m))return 'No hay conexión con el servidor. Revisa tu internet y vuelve a intentarlo.';
   return 'No se pudo completar la acción. Intenta de nuevo en un momento; si se repite, escríbenos desde Configuración. (Detalle: '+m+')';
@@ -1009,7 +1011,7 @@ function renderAuth(){
     h='<p class="lead">Cargando tus expedientes…</p>';
   }
   const titles={login:'Inicia sesión',signup:'Crea tu cuenta',code:'Confirma tu correo',forgot:'Recupera tu acceso',reset:'Nueva contraseña',loading:'Un momento'};
-  document.getElementById('app').innerHTML='<div class="auth"><div class="card auth-card"><div class="brand">'+MARK()+'<div><div class="name">lex<span class="i">ı<i></i></span></div><div class="tag">Plazos civiles</div></div></div><h1>'+titles[A.mode]+'</h1>'+h+'<p class="small muted" style="text-align:center;margin:0">Tus expedientes se guardan en tu cuenta. No cargues nombres de clientes ni datos personales. <a href="privacidad.html">Política de privacidad</a></p>'+(INAPP?'':'<a class="btn ghost block" href="'+APK+'" style="text-decoration:none">'+ic('phone')+'Descargar app para Android</a>')+'</div></div>';
+  document.getElementById('app').innerHTML='<div class="auth"><div class="card auth-card"><div class="brand">'+MARK()+'<div><div class="name"><span class="ad">ad</span>quem</div><div class="tag">Plazos civiles</div></div></div><h1>'+titles[A.mode]+'</h1>'+h+'<p class="small muted" style="text-align:center;margin:0">Tus expedientes se guardan en tu cuenta. No cargues nombres de clientes ni datos personales. <a href="privacidad.html">Política de privacidad</a></p>'+(INAPP?'':'<a class="btn ghost block" href="'+APK+'" style="text-decoration:none">'+ic('phone')+'Descargar app para Android</a>')+'</div></div>';
   const first=document.querySelector('.auth-card input:not([value]),.auth-card input[value=""]')||document.querySelector('.auth-card input');if(first&&!A.busy&&!A.err)first.focus();
 }
 /* ---------- encabezado, configuración y ventanas ---------- */
@@ -1018,7 +1020,7 @@ const okName=v=>v.length>=3&&v.length<=30&&!/[<>]/.test(v);
 const dispName=()=>(profile&&profile.username)||(user&&user.email)||'';
 function headerHTML(){
   const tag=user?'<span>Hola, <b>'+esc(dispName())+'</b></span><span id="sync" class="sync"></span>':'Plazos civiles · versión de prueba';
-  const brand='<div class="brand">'+MARK()+'<div><div class="name">lex<span class="i">ı<i></i></span></div><div class="'+(user?'hello':'tag')+'">'+tag+'</div></div></div>';
+  const brand='<div class="brand">'+MARK()+'<div><div class="name"><span class="ad">ad</span>quem</div><div class="'+(user?'hello':'tag')+'">'+tag+'</div></div></div>';
   if(!user)return '<header class="top">'+brand+'<div class="themes" role="group" aria-label="Tema de color">'+PALETAS.map(p=>'<button class="sw" data-action="palette" data-p="'+p[0]+'" aria-pressed="'+(tema===p[0])+'" aria-label="Tema '+p[1]+'" style="--s1:'+p[2]+';--s2:'+p[3]+'"><i></i><span class="lbl">'+p[1]+'</span></button>').join('')+'</div></header>';
   const gid=profile&&profile.guia&&GUIAS[profile.guia]?profile.guia:null;
   const D=ui.dato;
@@ -1107,7 +1109,7 @@ const NIVELES=[
  ['abogado','Abogado o abogada','Llevo mis propios casos.','check']
 ];
 const GUIAS={valeria:{n:'Dra. Valeria',yo:'la Dra. Valeria'},mateo:{n:'Dr. Mateo',yo:'el Dr. Mateo'}};
-const hola=g=>'¡Hola! Soy '+g.yo+'. Te acompaño a conocer Lexi paso a paso: qué hay en cada sección y cómo aprovecharla.';
+const hola=g=>'¡Hola! Soy '+g.yo+'. Te acompaño a conocer AdQuem paso a paso: qué hay en cada sección y cómo aprovecharla.';
 /* Expresiones del guía: ojos (n normal, h feliz cerrado, w abierto), desplazamiento de la mirada, cejas (cuánto sube cada una) y boca */
 const EXPR={
  neutral:{o:['n','n'],dx:0,dy:0,c:[0,0],b:'smile'},
@@ -1166,7 +1168,7 @@ function avatar(id,ex){
 /* Datos curiosos que cuenta el guía al tocar su carnet; cada uno con la expresión que mejor le queda */
 const DATOS=[
  ['sorpresa','En Roma había dies fasti y dies nefasti: días en que se podía administrar justicia y días en que no. De ahí viene la palabra «nefasto». Son los abuelos de nuestros días inhábiles.'],
- ['curioso','«Dies a quo» es el día desde el que se cuenta un plazo y «dies ad quem», el día en que vence. Lexi, en el fondo, calcula tu dies ad quem.'],
+ ['curioso','«Dies a quo» es el día desde el que se cuenta un plazo y «dies ad quem», el día en que vence. Por eso esta app se llama AdQuem: calcula tu dies ad quem.'],
  ['feliz','«Abogado» viene del latín advocatus: «el llamado» para ayudar a alguien ante el juez.'],
  ['pensativo','«Expediente» viene del latín expedire, que literalmente era «liberar los pies»: desenredar un asunto para que avance.'],
  ['sorpresa','«Calendario» viene de las kalendae, el primer día del mes romano, cuando vencían las deudas. El calendarium era el libro de cuentas de los prestamistas.'],
@@ -1206,7 +1208,7 @@ function renderOnboard(){
   const msg=O.err?'<div class="msg err" role="alert">'+esc(O.err)+'</div>':'';
   let h='';
   if(O.step===0){
-    h='<h1>Elige tu nombre de usuario</h1><p class="lead">Así te verás en Lexi. Puedes dejar el sugerido o cambiarlo.</p>'+
+    h='<h1>Elige tu nombre de usuario</h1><p class="lead">Así te verás en AdQuem. Puedes dejar el sugerido o cambiarlo.</p>'+
     '<form class="stack" data-form="ob-user"><label>Nombre de usuario<input id="o-user" required minlength="3" maxlength="30" autocomplete="nickname" value="'+esc(O.username)+'"><span class="hint">De 3 a 30 caracteres. Puedes usar mayúsculas, espacios y tildes.</span></label>'+msg+
     '<button class="btn block" type="submit"'+(O.busy?' disabled':'')+'>'+(O.busy?'Revisando…':'Continuar')+'</button></form>';
   }else if(O.step===1){
@@ -1215,7 +1217,7 @@ function renderOnboard(){
     '<button class="btn block" type="button" data-action="ob-next"'+(O.nivel?'':' disabled')+'>Continuar</button><button class="linkbtn" type="button" data-action="ob-back">Volver</button>';
   }else{
     const g=GUIAS[O.guia];
-    h='<h1>Elige a tu guía</h1><p class="lead">Te acompañará en un recorrido corto por Lexi.</p><div class="guides" role="group" aria-label="Guía">'+
+    h='<h1>Elige a tu guía</h1><p class="lead">Te acompañará en un recorrido corto por AdQuem.</p><div class="guides" role="group" aria-label="Guía">'+
     Object.keys(GUIAS).map(k=>'<button type="button" class="guide" data-action="ob-guia" data-v="'+k+'" aria-pressed="'+(O.guia===k)+'">'+avatar(k)+'<b>'+GUIAS[k].n+'</b></button>').join('')+'</div>'+
     '<div class="bubble '+(O.guia==='mateo'?'to-mateo':O.guia?'to-valeria':'to-none')+'" aria-live="polite">'+(g?esc(hola(g)):'Toca a quien quieras como guía.')+'</div>'+msg+
     '<button class="btn block" type="button" data-action="ob-finish"'+(O.guia&&!O.busy?'':' disabled')+'>'+(O.busy?'Guardando…':'Empezar el recorrido')+'</button><button class="linkbtn" type="button" data-action="ob-back">Volver</button>';
@@ -1262,12 +1264,12 @@ function tourSteps(){
   const g=GUIAS[(profile&&profile.guia)||'valeria'];
   return [
    {v:'hoy',hl:'carnet',t:hola(g)+' Me verás siempre aquí arriba, en mi carnet. Tócalo cuando quieras y te contaré un dato curioso del Derecho. Si quieres repetir este recorrido, está en la tuerca.'},
-   {v:'hoy',hl:'nav-hoy',t:'Esta es tu pantalla principal: lo que vence hoy, mañana y en los próximos 7 días. La hoja de calendario de cada plazo cambia de color según la urgencia: rojo si vence hoy o mañana, ámbar si es pronto, verde si ya lo presentaste.',x:nuevo?'Cuando presentes el escrito, pulsa «Marcar presentado» para que Lexi deje de alertarte.':''},
+   {v:'hoy',hl:'nav-hoy',t:'Esta es tu pantalla principal: lo que vence hoy, mañana y en los próximos 7 días. La hoja de calendario de cada plazo cambia de color según la urgencia: rojo si vence hoy o mañana, ámbar si es pronto, verde si ya lo presentaste.',x:nuevo?'Cuando presentes el escrito, pulsa «Marcar presentado» para que AdQuem deje de alertarte.':''},
    {v:'cal',hl:'nav-cal',t:'En el Calendario ves todos tus plazos y notas del mes. Los días grises son inhábiles y no cuentan para los plazos. Toca cualquier día para anotar algo, como «llevar anexos».'},
-   {v:'exp',hl:'nav-exp',t:'En Expedientes registras cada caso solo con su número. Eliges el acto, el tipo de proceso y la fecha de notificación, y Lexi calcula el último día y te muestra cómo lo contó.',x:nuevo?'Si no sabes qué tipo de proceso es, revísalo en el auto admisorio o pregúntale a tu abogado.':''},
-   {v:'reglas',hl:'nav-reglas',t:'En Reglas están los plazos que usa Lexi y los feriados. Si el Poder Judicial declara un día inhábil, agrégalo aquí y tus plazos se recalculan solos.'},
-   {v:'hoy',hl:'gear',t:'En la tuerca de configuración cambias los colores de Lexi y tu nombre de usuario, nos envías un mensaje, cierras sesión o eliminas tu cuenta.'},
-   {v:'hoy',hl:null,t:'Un último consejo: Lexi es una ayuda. La fecha oficial siempre se verifica en el sistema del Poder Judicial. ¡Éxitos con tus plazos!'}
+   {v:'exp',hl:'nav-exp',t:'En Expedientes registras cada caso solo con su número. Eliges el acto, el tipo de proceso y la fecha de notificación, y AdQuem calcula el último día y te muestra cómo lo contó.',x:nuevo?'Si no sabes qué tipo de proceso es, revísalo en el auto admisorio o pregúntale a tu abogado.':''},
+   {v:'reglas',hl:'nav-reglas',t:'En Reglas están los plazos que usa AdQuem y los feriados. Si el Poder Judicial declara un día inhábil, agrégalo aquí y tus plazos se recalculan solos.'},
+   {v:'hoy',hl:'gear',t:'En la tuerca de configuración cambias los colores de AdQuem y tu nombre de usuario, nos envías un mensaje, cierras sesión o eliminas tu cuenta.'},
+   {v:'hoy',hl:null,t:'Un último consejo: AdQuem es una ayuda. La fecha oficial siempre se verifica en el sistema del Poder Judicial. ¡Éxitos con tus plazos!'}
   ];
 }
 function renderTour(){
@@ -1277,7 +1279,7 @@ function renderTour(){
   const st=tourSteps(),i=ui.tour.i,s=st[i],g=GUIAS[(profile&&profile.guia)||'valeria'];
   document.body.classList.add('touring');
   if(s.hl){const t=s.hl.startsWith('nav-')?document.querySelector('.seg [data-v="'+s.hl.slice(4)+'"]'):document.querySelector('.'+s.hl);if(t){t.classList.add('hl');try{t.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'})}catch(e){}}}
-  const el=document.createElement('div');el.id='tour';el.className='tour';el.setAttribute('role','dialog');el.setAttribute('aria-label','Guía de Lexi');
+  const el=document.createElement('div');el.id='tour';el.className='tour';el.setAttribute('role','dialog');el.setAttribute('aria-label','Guía de AdQuem');
   el.innerHTML=avatar((profile&&profile.guia)||'valeria')+'<div><div class="tour-n">'+g.n+'</div><p>'+esc(s.t)+'</p>'+(s.x?'<p class="extra">'+esc(s.x)+'</p>':'')+
     '<div class="tour-ctl"><div class="tour-dots" aria-label="Paso '+(i+1)+' de '+st.length+'">'+st.map((_,k)=>'<i class="'+(k===i?'on':'')+'"></i>').join('')+'</div><div class="row" style="gap:6px">'+
     (i===st.length-1?'':'<button class="btn ghost sm" data-action="tour-skip">Saltar</button>')+
@@ -1292,7 +1294,7 @@ function tourAction(a){
   else if(ui.tour){
     const n=tourSteps().length;
     ui.tour.i+=a==='tour-next'?1:-1;
-    if(ui.tour.i>=n){ui.tour=null;toast('¡Listo! Ya puedes usar Lexi')}
+    if(ui.tour.i>=n){ui.tour=null;toast('¡Listo! Ya puedes usar AdQuem')}
     else if(ui.tour.i<0)ui.tour.i=0;
   }
   if(ui.tour){const v=tourSteps()[ui.tour.i].v;if(ui.view!==v){ui.view=v;ui.showForm=false;scrollTo(0,0)}}

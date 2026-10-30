@@ -1,6 +1,6 @@
-# Lexi para Android
+# AdQuem para Android
 
-App de Android que abre la web de Lexi (`https://degurechaff14.github.io/lexi/`) dentro de una app, con su propio ícono. Usa las mismas cuentas y datos que la web, y cada cambio publicado en la web aparece en la app sin reinstalarla.
+App de Android que abre la web de AdQuem (`https://degurechaff14.github.io/lexi/`) dentro de una app, con su propio ícono. Usa las mismas cuentas y datos que la web, y cada cambio publicado en la web aparece en la app sin reinstalarla.
 
 ## Cómo se genera el APK
 GitHub lo compila solo con el flujo `.github/workflows/android.yml`:
@@ -8,7 +8,7 @@ GitHub lo compila solo con el flujo `.github/workflows/android.yml`:
 - a mano: pestaña **Actions** → **App Android (APK)** → **Run workflow**.
 
 El APK queda en la pestaña **Releases** del repositorio. Enlace directo a la última versión:
-https://github.com/Degurechaff14/lexi/releases/latest/download/Lexi.apk
+https://github.com/Degurechaff14/lexi/releases/latest/download/AdQuem.apk
 
 ## Archivos
 - `capacitor.config.json`: nombre, identificador (`pe.lexi.plazos`) y dirección de la web.

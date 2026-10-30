@@ -1,6 +1,6 @@
-# Activar las cuentas de Lexi
+# Activar las cuentas de AdQuem
 
-Mientras `supabaseUrl` y `supabaseKey` estén vacíos en `index.html`, Lexi funciona como antes: sin cuentas y guardando todo en el navegador. Estos pasos activan el registro con correo y código, el inicio de sesión con Google y el guardado en la nube.
+Mientras `supabaseUrl` y `supabaseKey` estén vacíos en `index.html`, AdQuem funciona como antes: sin cuentas y guardando todo en el navegador. Estos pasos activan el registro con correo y código, el inicio de sesión con Google y el guardado en la nube.
 
 ## 1. Crear el proyecto en Supabase
 1. Entra a https://supabase.com y pulsa **Start your project**. Regístrate con GitHub o con tu correo.
@@ -22,14 +22,14 @@ Mientras `supabaseUrl` y `supabaseKey` estén vacíos en `index.html`, Lexi func
 1. **Authentication** → **Sign In / Providers** → **Email**: activado, con **Confirm email** activado.
 2. **Authentication** → **Emails** → plantilla **Confirm signup**. Reemplaza el contenido por:
    ```html
-   <h2>Confirma tu cuenta de Lexi</h2>
+   <h2>Confirma tu cuenta de AdQuem</h2>
    <p>Tu código de confirmación es:</p>
    <p style="font-size:28px;font-weight:bold;letter-spacing:6px">{{ .Token }}</p>
-   <p>Si no creaste una cuenta en Lexi, ignora este correo.</p>
+   <p>Si no creaste una cuenta en AdQuem, ignora este correo.</p>
    ```
 3. Plantilla **Reset password**:
    ```html
-   <h2>Recupera tu acceso a Lexi</h2>
+   <h2>Recupera tu acceso a AdQuem</h2>
    <p>Tu código para crear una contraseña nueva es:</p>
    <p style="font-size:28px;font-weight:bold;letter-spacing:6px">{{ .Token }}</p>
    ```
@@ -39,9 +39,9 @@ El correo que trae Supabase por defecto solo envía a los miembros de tu equipo 
 
 **Con Gmail (lo más simple):**
 1. En tu cuenta de Google activa la **verificación en dos pasos**.
-2. Entra a https://myaccount.google.com/apppasswords y crea una **contraseña de aplicación** llamada `Lexi`. Copia las 16 letras.
+2. Entra a https://myaccount.google.com/apppasswords y crea una **contraseña de aplicación** llamada `AdQuem`. Copia las 16 letras.
 3. En Supabase: **Authentication** → **Emails** → **SMTP Settings** → **Enable custom SMTP**:
-   - Sender email: tu Gmail · Sender name: `Lexi`
+   - Sender email: tu Gmail · Sender name: `AdQuem`
    - Host: `smtp.gmail.com` · Port: `465`
    - Username: tu Gmail · Password: la contraseña de aplicación
 4. Guarda. Gmail permite unos 500 correos al día.
@@ -52,12 +52,12 @@ El correo que trae Supabase por defecto solo envía a los miembros de tu equipo 
 - **Redirect URLs:** agrega `https://degurechaff14.github.io/lexi/`
 
 ## 6. Iniciar sesión con Google
-1. Entra a https://console.cloud.google.com y crea un proyecto llamado `Lexi`.
+1. Entra a https://console.cloud.google.com y crea un proyecto llamado `AdQuem`.
 2. **APIs y servicios** → **Pantalla de consentimiento de OAuth** (o **Google Auth Platform**):
-   - Tipo **Externo**, nombre de la app `Lexi`, tu correo de soporte y de contacto.
+   - Tipo **Externo**, nombre de la app `AdQuem`, tu correo de soporte y de contacto.
    - En **Público / Audience**, publica la app (**Publish app**) para que cualquier cuenta de Google pueda entrar.
 3. **Credenciales** → **Crear credenciales** → **ID de cliente de OAuth**:
-   - Tipo: **Aplicación web** · Nombre: `Lexi web`
+   - Tipo: **Aplicación web** · Nombre: `AdQuem web`
    - **Orígenes autorizados de JavaScript:** `https://degurechaff14.github.io`
    - **URI de redireccionamiento autorizados:** `https://TU-PROYECTO.supabase.co/auth/v1/callback`
      (está en Supabase → Authentication → Sign In / Providers → Google, como *Callback URL*).
