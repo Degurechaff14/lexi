@@ -256,7 +256,11 @@ details summary{cursor:pointer;font-weight:600}
 .guide b{font-weight:600}
 .guide small{color:var(--muted);font-size:.8rem}
 .bubble{position:relative;background:var(--soft);color:var(--ink);border-radius:14px;padding:12px 14px;font-size:.93rem;line-height:1.5}
-.bubble::before{content:"";position:absolute;left:28px;top:-7px;width:14px;height:14px;background:inherit;transform:rotate(45deg);border-radius:2px}
+.bubble::before{content:"";position:absolute;left:calc(25% - 7px);top:-7px;width:14px;height:14px;background:inherit;transform:rotate(45deg);border-radius:2px;transition:left .25s}
+/* el piquito apunta al guía elegido; sin elección no apunta a nadie */
+.bubble.to-mateo::before{left:calc(75% - 7px)}
+.bubble.to-none{text-align:center}
+.bubble.to-none::before{display:none}
 /* abogados ilustrados: toman los colores del tema */
 .av .bg{fill:var(--soft)}
 .av .suit{fill:var(--accent)}
@@ -1213,7 +1217,7 @@ function renderOnboard(){
     const g=GUIAS[O.guia];
     h='<h1>Elige a tu guía</h1><p class="lead">Te acompañará en un recorrido corto por Lexi.</p><div class="guides" role="group" aria-label="Guía">'+
     Object.keys(GUIAS).map(k=>'<button type="button" class="guide" data-action="ob-guia" data-v="'+k+'" aria-pressed="'+(O.guia===k)+'">'+avatar(k)+'<b>'+GUIAS[k].n+'</b></button>').join('')+'</div>'+
-    '<div class="bubble" aria-live="polite">'+(g?esc(hola(g)):'Toca a quien quieras como guía.')+'</div>'+msg+
+    '<div class="bubble '+(O.guia==='mateo'?'to-mateo':O.guia?'to-valeria':'to-none')+'" aria-live="polite">'+(g?esc(hola(g)):'Toca a quien quieras como guía.')+'</div>'+msg+
     '<button class="btn block" type="button" data-action="ob-finish"'+(O.guia&&!O.busy?'':' disabled')+'>'+(O.busy?'Guardando…':'Empezar el recorrido')+'</button><button class="linkbtn" type="button" data-action="ob-back">Volver</button>';
   }
   document.getElementById('app').innerHTML='<div class="auth"><div class="card auth-card ob">'+bar+h+'</div></div>';
