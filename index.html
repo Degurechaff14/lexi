@@ -1011,7 +1011,7 @@ function renderAuth(){
     h='<p class="lead">Cargando tus expedientes…</p>';
   }
   const titles={login:'Inicia sesión',signup:'Crea tu cuenta',code:'Confirma tu correo',forgot:'Recupera tu acceso',reset:'Nueva contraseña',loading:'Un momento'};
-  document.getElementById('app').innerHTML='<div class="auth"><div class="card auth-card"><div class="brand">'+MARK()+'<div><div class="name"><span class="ad">ad</span>quem</div><div class="tag">Plazos civiles</div></div></div><h1>'+titles[A.mode]+'</h1>'+h+'<p class="small muted" style="text-align:center;margin:0">Tus expedientes se guardan en tu cuenta. No cargues nombres de clientes ni datos personales. <a href="privacidad.html">Política de privacidad</a></p>'+(INAPP?'':'<a class="btn ghost block" href="'+APK+'" style="text-decoration:none">'+ic('phone')+'Descargar app para Android</a>')+'</div></div>';
+  document.getElementById('app').innerHTML='<div class="auth"><div class="card auth-card"><div class="brand">'+MARK()+'<div><div class="name"><span class="ad">Ad</span>Quem</div><div class="tag">Plazos civiles</div></div></div><h1>'+titles[A.mode]+'</h1>'+h+'<p class="small muted" style="text-align:center;margin:0">Tus expedientes se guardan en tu cuenta. No cargues nombres de clientes ni datos personales. <a href="privacidad.html">Política de privacidad</a></p>'+(INAPP?'':'<a class="btn ghost block" href="'+APK+'" style="text-decoration:none">'+ic('phone')+'Descargar app para Android</a>')+'</div></div>';
   const first=document.querySelector('.auth-card input:not([value]),.auth-card input[value=""]')||document.querySelector('.auth-card input');if(first&&!A.busy&&!A.err)first.focus();
 }
 /* ---------- encabezado, configuración y ventanas ---------- */
@@ -1020,7 +1020,7 @@ const okName=v=>v.length>=3&&v.length<=30&&!/[<>]/.test(v);
 const dispName=()=>(profile&&profile.username)||(user&&user.email)||'';
 function headerHTML(){
   const tag=user?'<span>Hola, <b>'+esc(dispName())+'</b></span><span id="sync" class="sync"></span>':'Plazos civiles · versión de prueba';
-  const brand='<div class="brand">'+MARK()+'<div><div class="name"><span class="ad">ad</span>quem</div><div class="'+(user?'hello':'tag')+'">'+tag+'</div></div></div>';
+  const brand='<div class="brand">'+MARK()+'<div><div class="name"><span class="ad">Ad</span>Quem</div><div class="'+(user?'hello':'tag')+'">'+tag+'</div></div></div>';
   if(!user)return '<header class="top">'+brand+'<div class="themes" role="group" aria-label="Tema de color">'+PALETAS.map(p=>'<button class="sw" data-action="palette" data-p="'+p[0]+'" aria-pressed="'+(tema===p[0])+'" aria-label="Tema '+p[1]+'" style="--s1:'+p[2]+';--s2:'+p[3]+'"><i></i><span class="lbl">'+p[1]+'</span></button>').join('')+'</div></header>';
   const gid=profile&&profile.guia&&GUIAS[profile.guia]?profile.guia:null;
   const D=ui.dato;
